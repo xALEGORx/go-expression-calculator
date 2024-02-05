@@ -1,0 +1,79 @@
+basePath: /api/v1
+definitions:
+  handler.TaskCreateRequest:
+    properties:
+      expression:
+        type: string
+    required:
+    - expression
+    type: object
+  repositories.TaskModel:
+    properties:
+      expression:
+        type: string
+      task_id:
+        type: integer
+    type: object
+  response.SuccessResponse:
+    properties:
+      code:
+        type: integer
+      data: {}
+      message:
+        type: string
+    type: object
+info:
+  contact: {}
+  description: Endpoints for expression calculator by ALEGOR
+  title: Expression Calculator
+  version: "1.0"
+paths:
+  /task:
+    get:
+      consumes:
+      - application/json
+      operationId: task-index
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.SuccessResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/repositories.TaskModel'
+                  type: array
+              type: object
+      summary: Get all tasks
+      tags:
+      - Task
+    post:
+      consumes:
+      - application/json
+      operationId: task-store
+      parameters:
+      - description: fields
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/handler.TaskCreateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.SuccessResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/repositories.TaskModel'
+              type: object
+      summary: Create task
+      tags:
+      - Task
+swagger: "2.0"
