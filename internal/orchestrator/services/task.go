@@ -23,6 +23,7 @@ func (t *Task) Create(expression string) (repositories.TaskModel, error) {
 
 	task := repositories.TaskModel{
 		TaskID:     taskId,
+		Status:     repositories.STATUS_CREATED,
 		Expression: expression,
 	}
 

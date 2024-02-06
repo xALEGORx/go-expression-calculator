@@ -27,7 +27,7 @@ func main() {
 	}
 
 	// try to connect to rabbitmq
-	broker, err := rabbitmq.Init()
+	broker, err := rabbitmq.Init(config_.RabbitURL, config_.RabbitQueue)
 	if err != nil {
 		logrus.Fatal("rabbitmq connection failed")
 		return
@@ -43,6 +43,7 @@ func main() {
 	router := gin.Default()
 	routes.InitRouter(router)
 
+	logrus.Info("Orchestrator was successful started!")
 	// run a server
 	if err = router.Run(config_.ServerAddr); err != nil {
 		logrus.Fatal("database connection failed")

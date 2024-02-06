@@ -1,8 +1,11 @@
 package config
 
-import "os"
+import (
+	"github.com/joho/godotenv"
+	"os"
+)
 
-type iconfig struct {
+type IConfig struct {
 	ServerAddr string
 	Mode       string
 
@@ -16,10 +19,12 @@ type iconfig struct {
 	RabbitQueue string
 }
 
-var config *iconfig
+var config *IConfig
 
-func Init() *iconfig {
-	config = &iconfig{
+func Init() *IConfig {
+	godotenv.Load()
+
+	config = &IConfig{
 		ServerAddr: getEnv("SERVER_ADDR", "localhost:8080"),
 		Mode:       getEnv("MODE", "debug"),
 
@@ -36,7 +41,7 @@ func Init() *iconfig {
 	return config
 }
 
-func Get() *iconfig {
+func Get() *IConfig {
 	return config
 }
 

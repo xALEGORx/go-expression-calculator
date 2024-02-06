@@ -1,7 +1,44 @@
 package main
 
-import "fmt"
+import (
+	"flag"
+	"github.com/sirupsen/logrus"
+	"github.com/xALEGORx/go-expression-calculator/internal/agent"
+	"github.com/xALEGORx/go-expression-calculator/pkg/logger"
+	"github.com/xALEGORx/go-expression-calculator/pkg/rabbitmq"
+)
+
+type IConfig struct {
+	WorkerID    string
+	RabbitURL   string
+	RabbitQueue string
+	Threads     int
+}
 
 func main() {
-	fmt.Println("Agent started")
+	config := &IConfig{}
+	flag.StringVar(&config.RabbitURL, "url", "amqp://guest:guest@localhost:5672", "RabbitMQ url for connection")
+	flag.StringVar(&config.RabbitQueue, "queue", "CalculatorTaskQueue1", "RabbitMQ queue name for listen")
+	flag.StringVar(&config.WorkerID, "worker", "worker", "Optional name of agent")
+	flag.IntVar(&config.Threads, "threads", 5, "Threads count for goroutine")
+	flag.Parse()
+
+	// initialization a logrus
+	logger.Init()
+
+	// try to connect to rabbitmq
+	broker, err := rabbitmq.Init(config.RabbitURL, config.RabbitQueue)
+	if err != nil {
+		logrus.Fatal("rabbitmq connection failed")
+		return
+	}
+	messages, err := broker.ConnQueue()
+	done := make(chan bool)
+
+	for i := 0; i < config.Threads; i++ {
+		go agent.Solver(messages)
+	}
+
+	logrus.Infof("Agent \"%s\" was started with %d threads", config.WorkerID, config.Threads)
+	<-done
 }

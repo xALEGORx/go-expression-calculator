@@ -2,9 +2,7 @@ package rabbitmq
 
 import (
 	"crypto/tls"
-
 	"github.com/streadway/amqp"
-	"github.com/xALEGORx/go-expression-calculator/pkg/config"
 )
 
 type IBroker struct {
@@ -15,12 +13,11 @@ type IBroker struct {
 
 var broker *IBroker
 
-func Init() (*IBroker, error) {
-	appConfig := config.Get()
+func Init(dsn string, queue string) (*IBroker, error) {
 	cfg := new(tls.Config)
 	cfg.InsecureSkipVerify = true
 
-	conn, err := amqp.DialTLS(appConfig.RabbitURL, cfg)
+	conn, err := amqp.DialTLS(dsn, cfg)
 	if err != nil {
 		return nil, err
 	}
@@ -32,7 +29,7 @@ func Init() (*IBroker, error) {
 	broker = &IBroker{
 		Connection: conn,
 		Channel:    ch,
-		Queue:      appConfig.RabbitQueue,
+		Queue:      queue,
 	}
 
 	return broker, nil
@@ -49,6 +46,22 @@ func (b *IBroker) InitQueue() error {
 	)
 
 	return err
+}
+
+func (b *IBroker) ConnQueue() (<-chan amqp.Delivery, error) {
+	messages, err := b.Channel.Consume(
+		b.Queue, // queue name
+		"",      // consumer
+		true,    // auto-ack
+		false,   // exclusive
+		false,   // no local
+		false,   // no wait
+		nil,     // arguments
+	)
+	if err != nil {
+		return nil, err
+	}
+	return messages, nil
 }
 
 func (b *IBroker) SendTask(task string) error {
