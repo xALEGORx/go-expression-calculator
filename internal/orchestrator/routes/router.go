@@ -6,10 +6,12 @@ import (
 	ginSwagger "github.com/swaggo/gin-swagger"
 	_ "github.com/xALEGORx/go-expression-calculator/docs"
 	"github.com/xALEGORx/go-expression-calculator/internal/orchestrator/handler"
+	"github.com/xALEGORx/go-expression-calculator/internal/orchestrator/middlewares"
 )
 
 func InitRouter(router *gin.Engine) *gin.Engine {
 	v1 := router.Group("/api/v1")
+	v1.Use(middlewares.CORS())
 	{
 		// task
 		{
