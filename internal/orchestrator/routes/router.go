@@ -16,6 +16,7 @@ func InitRouter(router *gin.Engine) *gin.Engine {
 			task := &handler.Task{Route: v1.Group("/task")}
 			task.Route.GET("", task.Index)
 			task.Route.POST("", task.Store)
+			task.Route.GET("/:id", task.Show)
 		}
 	}
 

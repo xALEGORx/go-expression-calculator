@@ -5,6 +5,7 @@ import (
 	"github.com/xALEGORx/go-expression-calculator/internal/orchestrator/repositories"
 	"github.com/xALEGORx/go-expression-calculator/internal/orchestrator/services"
 	"github.com/xALEGORx/go-expression-calculator/pkg/response"
+	"strconv"
 )
 
 type Task struct {
@@ -55,4 +56,28 @@ func (p *Task) Store(ctx *gin.Context) {
 	}
 
 	response.Data(ctx, task)
+}
+
+// @Summary Get all tasks
+// @Tags Task
+// @ID task-show
+// @Accept json
+// @Produce json
+// @Success 200 {object} response.SuccessResponse{data=repositories.TaskModel}
+// @Router /task/:id [get]
+func (p *Task) Show(ctx *gin.Context) {
+	taskIdUrl := ctx.Param("id")
+	taskId, err := strconv.Atoi(taskIdUrl)
+	if taskId == 0 || err != nil {
+		response.BadRequest(ctx, "введите корректный task_id")
+		return
+	}
+
+	tasks, err := repositories.TaskRepository().GetById(taskId)
+	if err != nil {
+		response.NotFound(ctx, err.Error())
+		return
+	}
+
+	response.Data(ctx, tasks)
 }

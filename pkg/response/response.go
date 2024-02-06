@@ -17,23 +17,30 @@ type ErrorResponse struct {
 	Error interface{} `json:"error"`
 }
 
-func Data(c *gin.Context, data interface{}) {
-	c.JSON(http.StatusOK, &SuccessResponse{
+func Data(ctx *gin.Context, data interface{}) {
+	ctx.JSON(http.StatusOK, &SuccessResponse{
 		Code: http.StatusOK,
 		Data: data,
 	})
 }
 
-func BadRequest(c *gin.Context, message string) {
-	c.JSON(http.StatusBadRequest, &ErrorResponse{
+func BadRequest(ctx *gin.Context, message string) {
+	ctx.JSON(http.StatusBadRequest, &ErrorResponse{
 		Code:  http.StatusBadRequest,
 		Error: message,
 	})
 }
 
-func InternalServerError(c *gin.Context, message string) {
-	c.JSON(http.StatusInternalServerError, &ErrorResponse{
+func InternalServerError(ctx *gin.Context, message string) {
+	ctx.JSON(http.StatusInternalServerError, &ErrorResponse{
 		Code:  http.StatusInternalServerError,
+		Error: message,
+	})
+}
+
+func NotFound(ctx *gin.Context, message string) {
+	ctx.JSON(http.StatusNotFound, &ErrorResponse{
+		Code:  http.StatusNotFound,
 		Error: message,
 	})
 }
