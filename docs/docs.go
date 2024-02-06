@@ -96,6 +96,41 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/task/:id": {
+            "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Task"
+                ],
+                "summary": "Get all tasks",
+                "operationId": "task-show",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/repositories.TaskModel"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -113,7 +148,13 @@ const docTemplate = `{
         "repositories.TaskModel": {
             "type": "object",
             "properties": {
+                "error": {
+                    "type": "string"
+                },
                 "expression": {
+                    "type": "string"
+                },
+                "status": {
                     "type": "string"
                 },
                 "task_id": {

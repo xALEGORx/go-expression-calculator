@@ -9,7 +9,11 @@ definitions:
     type: object
   repositories.TaskModel:
     properties:
+      error:
+        type: string
       expression:
+        type: string
+      status:
         type: string
       task_id:
         type: integer
@@ -74,6 +78,26 @@ paths:
                   $ref: '#/definitions/repositories.TaskModel'
               type: object
       summary: Create task
+      tags:
+      - Task
+  /task/:id:
+    get:
+      consumes:
+      - application/json
+      operationId: task-show
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.SuccessResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/repositories.TaskModel'
+              type: object
+      summary: Get all tasks
       tags:
       - Task
 swagger: "2.0"
