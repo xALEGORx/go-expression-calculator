@@ -12,7 +12,8 @@ type iconfig struct {
 	PostgresPort     string
 	PostgresDatabase string
 
-	RabbitURL string
+	RabbitURL   string
+	RabbitQueue string
 }
 
 var config *iconfig
@@ -28,7 +29,8 @@ func Init() *iconfig {
 		PostgresPort:     getEnv("POSTGRES_PORT", "5432"),
 		PostgresDatabase: getEnv("POSTGRES_DATABASE", "calculator"),
 
-		RabbitURL: getEnv("RABBIT_URL", "amqp://guest:guest@localhost:5672"),
+		RabbitURL:   getEnv("RABBIT_URL", "amqp://guest:guest@localhost:5672"),
+		RabbitQueue: getEnv("RABBIT_QUEUE", "CalculatorTaskQueue1"),
 	}
 
 	return config

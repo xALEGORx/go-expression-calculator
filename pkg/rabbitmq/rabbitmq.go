@@ -7,34 +7,67 @@ import (
 	"github.com/xALEGORx/go-expression-calculator/pkg/config"
 )
 
-type ibroker struct {
+type IBroker struct {
 	Connection *amqp.Connection
 	Channel    *amqp.Channel
+	Queue      string
 }
 
-var broker *ibroker
+var broker *IBroker
 
-func Init() error {
+func Init() (*IBroker, error) {
+	appConfig := config.Get()
 	cfg := new(tls.Config)
 	cfg.InsecureSkipVerify = true
 
-	conn, err := amqp.DialTLS(config.Get().RabbitURL, cfg)
+	conn, err := amqp.DialTLS(appConfig.RabbitURL, cfg)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	ch, err := conn.Channel()
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	broker = &ibroker{
+	broker = &IBroker{
 		Connection: conn,
 		Channel:    ch,
+		Queue:      appConfig.RabbitQueue,
 	}
 
-	return nil
+	return broker, nil
 }
 
-func Get() *ibroker {
+func (b *IBroker) InitQueue() error {
+	_, err := b.Channel.QueueDeclare(
+		b.Queue, // queue name
+		true,    // durable
+		false,   // auto delete
+		false,   // exclusive
+		false,   // no wait
+		nil,     // arguments
+	)
+
+	return err
+}
+
+func (b *IBroker) SendTask(task string) error {
+	message := amqp.Publishing{
+		ContentType: "text/plain",
+		Body:        []byte(task),
+	}
+
+	err := b.Channel.Publish(
+		"",
+		b.Queue,
+		false,
+		false,
+		message,
+	)
+
+	return err
+}
+
+func Get() *IBroker {
 	return broker
 }
