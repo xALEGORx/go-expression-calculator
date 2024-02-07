@@ -1,8 +1,11 @@
 package services
 
 import (
+	"github.com/streadway/amqp"
 	"github.com/xALEGORx/go-expression-calculator/internal/orchestrator/repositories"
+	"github.com/xALEGORx/go-expression-calculator/pkg/config"
 	"github.com/xALEGORx/go-expression-calculator/pkg/rabbitmq"
+	"strconv"
 )
 
 type Task struct {
@@ -17,7 +20,15 @@ func (t *Task) Create(expression string) (repositories.TaskModel, error) {
 	}
 
 	// send task to queue of rabbitmq
-	if err = rabbitmq.Get().SendTask(expression); err != nil {
+
+	message := amqp.Publishing{
+		ContentType:   "text/plain",
+		Body:          []byte(expression),
+		Type:          "task",
+		CorrelationId: strconv.Itoa(taskId),
+	}
+
+	if err = rabbitmq.Get().SendToQueue(config.Get().RabbitTaskQueue, message); err != nil {
 		return repositories.TaskModel{}, err
 	}
 

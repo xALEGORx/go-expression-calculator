@@ -8,12 +8,11 @@ import (
 type IBroker struct {
 	Connection *amqp.Connection
 	Channel    *amqp.Channel
-	Queue      string
 }
 
 var broker *IBroker
 
-func Init(dsn string, queue string) (*IBroker, error) {
+func Init(dsn string) (*IBroker, error) {
 	cfg := new(tls.Config)
 	cfg.InsecureSkipVerify = true
 
@@ -29,34 +28,33 @@ func Init(dsn string, queue string) (*IBroker, error) {
 	broker = &IBroker{
 		Connection: conn,
 		Channel:    ch,
-		Queue:      queue,
 	}
 
 	return broker, nil
 }
 
-func (b *IBroker) InitQueue() error {
+func (b *IBroker) InitQueue(queue string) error {
 	_, err := b.Channel.QueueDeclare(
-		b.Queue, // queue name
-		true,    // durable
-		false,   // auto delete
-		false,   // exclusive
-		false,   // no wait
-		nil,     // arguments
+		queue, // queue name
+		true,  // durable
+		false, // auto delete
+		false, // exclusive
+		false, // no wait
+		nil,   // arguments
 	)
 
 	return err
 }
 
-func (b *IBroker) ConnQueue() (<-chan amqp.Delivery, error) {
+func (b *IBroker) ConnQueue(queue string) (<-chan amqp.Delivery, error) {
 	messages, err := b.Channel.Consume(
-		b.Queue, // queue name
-		"",      // consumer
-		true,    // auto-ack
-		false,   // exclusive
-		false,   // no local
-		false,   // no wait
-		nil,     // arguments
+		queue, // queue name
+		"",
+		true,
+		false,
+		false,
+		false,
+		nil,
 	)
 	if err != nil {
 		return nil, err
@@ -64,15 +62,10 @@ func (b *IBroker) ConnQueue() (<-chan amqp.Delivery, error) {
 	return messages, nil
 }
 
-func (b *IBroker) SendTask(task string) error {
-	message := amqp.Publishing{
-		ContentType: "text/plain",
-		Body:        []byte(task),
-	}
-
+func (b *IBroker) SendToQueue(queue string, message amqp.Publishing) error {
 	err := b.Channel.Publish(
 		"",
-		b.Queue,
+		queue,
 		false,
 		false,
 		message,

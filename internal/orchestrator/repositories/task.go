@@ -9,7 +9,7 @@ type TaskModel struct {
 	TaskID     int    `json:"task_id"`
 	Expression string `json:"expression"`
 	Status     string `json:"status"`
-	Error      string `json:"error"`
+	Answer     string `json:"answer"`
 }
 
 const (
@@ -31,7 +31,7 @@ func (t *Task) GetAllTasks() ([]TaskModel, error) {
 
 	for rows.Next() {
 		var task TaskModel
-		if err = rows.Scan(&task.TaskID, &task.Expression, &task.Status, &task.Error); err != nil {
+		if err = rows.Scan(&task.TaskID, &task.Expression, &task.Status, &task.Answer); err != nil {
 			return nil, err
 		}
 		tasks = append(tasks, task)
@@ -48,7 +48,7 @@ func (t *Task) GetAllTasks() ([]TaskModel, error) {
 func (t *Task) Create(expression string) (int, error) {
 	var insertedID int
 
-	query := "INSERT INTO tasks (expression, status, error) VALUES ($1, $2, $3) RETURNING task_id"
+	query := "INSERT INTO tasks (expression, status, answer) VALUES ($1, $2, $3) RETURNING task_id"
 	if err := database.DB.QueryRow(query, expression, STATUS_CREATED, "").Scan(&insertedID); err != nil {
 		return 0, err
 	}
@@ -61,11 +61,21 @@ func (t *Task) GetById(taskId int) (TaskModel, error) {
 	var task TaskModel
 
 	query := "SELECT * FROM tasks WHERE task_id = $1"
-	if err := database.DB.QueryRow(query, taskId).Scan(&task.TaskID, &task.Expression, &task.Status, &task.Error); err != nil {
+	if err := database.DB.QueryRow(query, taskId).Scan(&task.TaskID, &task.Expression, &task.Status, &task.Answer); err != nil {
 		return task, err
 	}
 
 	return task, nil
+}
+
+// Update answer for expression by task id
+func (t *Task) SetAnswer(taskId int, answer string, status string) error {
+	query := "UPDATE tasks SET answer = $1, status = $2 WHERE task_id = $3"
+	if _, err := database.DB.Query(query, answer, status, taskId); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func TaskRepository() *Task {
