@@ -7,6 +7,7 @@ import (
 	_ "github.com/xALEGORx/go-expression-calculator/docs"
 	"github.com/xALEGORx/go-expression-calculator/internal/orchestrator/handler"
 	"github.com/xALEGORx/go-expression-calculator/internal/orchestrator/middlewares"
+	"net/http"
 )
 
 func InitRouter(router *gin.Engine) *gin.Engine {
@@ -19,6 +20,11 @@ func InitRouter(router *gin.Engine) *gin.Engine {
 			task.Route.GET("", task.Index)
 			task.Route.POST("", task.Store)
 			task.Route.GET("/:id", task.Show)
+
+			// why? idk
+			task.Route.OPTIONS("", func(c *gin.Context) {
+				c.Status(http.StatusOK)
+			})
 		}
 	}
 

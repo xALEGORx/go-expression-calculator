@@ -6,7 +6,7 @@ import Servers from "./components/servers/servers";
 
 function App() {
     return (
-        <div className="h-screen w-screen px-64 py-16 bg-dark-white">
+        <div className="h-screen w-screen px-64 py-16 overflow-x-hidden">
             <div className="w-full h-full text-white rounded-lg">
                 <header className="text-black font-semibold text-xl p-5 flex justify-between items-center bg-white mb-5 rounded-md block-shadow">
                     <div className="w-1/2 flex gap-3">

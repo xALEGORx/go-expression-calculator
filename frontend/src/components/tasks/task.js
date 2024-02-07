@@ -1,14 +1,28 @@
-import React, { useEffect } from 'react'
+import React from 'react'
 
 export default function Task({ task }) {
+    const statuscoloros = {
+        "completed": "bg-[#08c708]",
+        "created": "bg-[#fbff03]",
+        "fail": "bg-[#c70808]"
+    };
+
+    const taskColor = statuscoloros[task.status];
+
     return (
         <div className="border border-gray flex items-center rounded-md p-3 justify-between">
             <div className="flex items-center gap-5">
-                <span className={`w-8 h-8 inline-block rounded-full bg-${task.status}`}></span>
-                <span className="text-black font-semibold text-xl">{task.expression}</span>
+                <span className={`w-8 h-8 inline-block rounded-full ${taskColor}`}></span>
+                <span className="text-black font-semibold text-xl">{task.expression}{task.status === "completed" ? " = " + task.answer : ""}</span>
                 <span className={`text-gray`}>{prepareStatus(task.status)}</span>
+                {task.status === "fail" ? (
+                    <span className="text-[#c70808] font-semibold text-xl">
+                        {task.answer}
+                    </span>
+                ) : (<span></span>)}
             </div>
             <div>
+                <span className="text-completed"></span>
                 <span className="text-gray text-sm">07.02.2024 00:21:27</span>
             </div>
         </div>
@@ -18,7 +32,13 @@ export default function Task({ task }) {
 function prepareStatus(status) {
     switch (status) {
         case "created":
+            return "Создан"
+        case "progress":
             return "В процессе"
+        case "completed":
+            return "Завершен"
+        case "fail":
+            return "Ошибка"
         default:
             return "Unknown status"
     }

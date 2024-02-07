@@ -6,6 +6,11 @@ class ApiService {
   getTasks() {
     return axios.get(API_URL + "task");
   }
+  addTask(expression) {
+    return axios.post(API_URL + "task", {expression: expression})
+  }
 }
 
-export default new ApiService();
+const apiService = new ApiService();
+
+export default apiService;
