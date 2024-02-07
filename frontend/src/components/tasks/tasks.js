@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import Task from "./task";
-import ApiService from "./../../api";
+import apiService from "./../../api";
 
 export default class Tasks extends Component {
     constructor(props) {
@@ -22,13 +22,13 @@ export default class Tasks extends Component {
     handleAddTask() {
         this.setState({ expression: "" })
 
-        ApiService.addTask(this.state.expression).then((response) => {
+        apiService.addTask(this.state.expression).then((response) => {
             this.getTaskList()
         })
     }
 
     getTaskList() {
-        ApiService.getTasks().then(
+        apiService.getTasks().then(
             response => {
                 this.setState({ tasks: response.data.data })
             }

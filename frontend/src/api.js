@@ -9,6 +9,10 @@ class ApiService {
   addTask(expression) {
     return axios.post(API_URL + "task", {expression: expression})
   }
+
+  getAgents() {
+    return axios.get(API_URL + "agent");
+  }
 }
 
 const apiService = new ApiService();
