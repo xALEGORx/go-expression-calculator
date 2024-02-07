@@ -1,24 +1,22 @@
 package database
 
 import (
-	"github.com/jackc/pgx"
+	"context"
+	"fmt"
+	"github.com/jackc/pgx/v5/pgxpool"
 
 	"github.com/xALEGORx/go-expression-calculator/pkg/config"
 )
 
-var DB *pgx.Conn
+var DB *pgxpool.Pool
 
 func Init() error {
 	var err error
 	iconfig := config.Get()
 
-	DB, err = pgx.Connect(pgx.ConnConfig{
-		Host:     iconfig.PostgresHost,
-		Port:     5432,
-		Database: iconfig.PostgresDatabase,
-		User:     iconfig.PostgresUser,
-		Password: iconfig.PostgresPassword,
-	})
+	dsn := fmt.Sprintf("postgres://%s:%s@%s:%s/%s", iconfig.PostgresUser, iconfig.PostgresPassword, iconfig.PostgresHost, iconfig.PostgresPort, iconfig.PostgresDatabase)
+
+	DB, err = pgxpool.New(context.Background(), dsn)
 
 	return err
 }

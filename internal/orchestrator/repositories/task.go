@@ -1,6 +1,9 @@
 package repositories
 
-import "github.com/xALEGORx/go-expression-calculator/pkg/database"
+import (
+	"context"
+	"github.com/xALEGORx/go-expression-calculator/pkg/database"
+)
 
 type Task struct {
 }
@@ -21,7 +24,7 @@ const (
 
 // Get all tasks in database
 func (t *Task) GetAllTasks() ([]TaskModel, error) {
-	rows, err := database.DB.Query("SELECT * FROM tasks")
+	rows, err := database.DB.Query(context.Background(), "SELECT * FROM tasks ORDER BY task_id DESC")
 	if err != nil {
 		return nil, err
 	}
@@ -49,7 +52,7 @@ func (t *Task) Create(expression string) (int, error) {
 	var insertedID int
 
 	query := "INSERT INTO tasks (expression, status, answer) VALUES ($1, $2, $3) RETURNING task_id"
-	if err := database.DB.QueryRow(query, expression, STATUS_CREATED, "").Scan(&insertedID); err != nil {
+	if err := database.DB.QueryRow(context.Background(), query, expression, STATUS_CREATED, "").Scan(&insertedID); err != nil {
 		return 0, err
 	}
 
@@ -61,7 +64,7 @@ func (t *Task) GetById(taskId int) (TaskModel, error) {
 	var task TaskModel
 
 	query := "SELECT * FROM tasks WHERE task_id = $1"
-	if err := database.DB.QueryRow(query, taskId).Scan(&task.TaskID, &task.Expression, &task.Status, &task.Answer); err != nil {
+	if err := database.DB.QueryRow(context.Background(), query, taskId).Scan(&task.TaskID, &task.Expression, &task.Status, &task.Answer); err != nil {
 		return task, err
 	}
 
@@ -71,7 +74,7 @@ func (t *Task) GetById(taskId int) (TaskModel, error) {
 // Update answer for expression by task id
 func (t *Task) SetAnswer(taskId int, answer string, status string) error {
 	query := "UPDATE tasks SET answer = $1, status = $2 WHERE task_id = $3"
-	if _, err := database.DB.Query(query, answer, status, taskId); err != nil {
+	if _, err := database.DB.Query(context.Background(), query, answer, status, taskId); err != nil {
 		return err
 	}
 
