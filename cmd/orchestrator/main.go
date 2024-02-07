@@ -3,7 +3,7 @@ package main
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
-	"github.com/xALEGORx/go-expression-calculator/internal/orchestrator"
+	"github.com/xALEGORx/go-expression-calculator/internal/orchestrator/agents"
 	"github.com/xALEGORx/go-expression-calculator/internal/orchestrator/routes"
 	"github.com/xALEGORx/go-expression-calculator/pkg/config"
 	"github.com/xALEGORx/go-expression-calculator/pkg/database"
@@ -39,14 +39,14 @@ func main() {
 		return
 	}
 	// try to create a queue for server responses
-	if err = broker.InitQueue(config_.RabbitServerQueue); err != nil {
+	if err = broker.InitQueue(config_.RabbitAgentQueue); err != nil {
 		logrus.Fatal("rabbitmq fail creation a queue for servers")
 		return
 	}
 
-	// start listen a responses from servers
-	messages, err := broker.ConnQueue(config_.RabbitServerQueue)
-	go orchestrator.HandleServerResponse(messages)
+	// start listen a responses from agents
+	messages, err := broker.ConnQueue(config_.RabbitAgentQueue)
+	go agents.HandleAgentResponse(messages)
 
 	// initialization a gin
 	gin.SetMode(config_.Mode)

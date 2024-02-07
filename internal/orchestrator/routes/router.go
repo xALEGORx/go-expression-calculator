@@ -26,6 +26,12 @@ func InitRouter(router *gin.Engine) *gin.Engine {
 				c.Status(http.StatusOK)
 			})
 		}
+
+		// agent
+		{
+			agent := &handler.Agent{Route: v1.Group("/agent")}
+			agent.Route.GET("", agent.Index)
+		}
 	}
 
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler, ginSwagger.DefaultModelsExpandDepth(-1)))

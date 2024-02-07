@@ -9,19 +9,19 @@ import (
 )
 
 type IConfig struct {
-	WorkerID          string
-	RabbitURL         string
-	RabbitTaskQueue   string
-	RabbitServerQueue string
-	Threads           int
+	AgentID          string
+	RabbitURL        string
+	RabbitTaskQueue  string
+	RabbitAgentQueue string
+	Threads          int
 }
 
 func main() {
 	config := &IConfig{}
 	flag.StringVar(&config.RabbitURL, "url", "amqp://guest:guest@localhost:5672", "RabbitMQ url for connection")
 	flag.StringVar(&config.RabbitTaskQueue, "queue", "CalculatorTaskQueue1", "RabbitMQ queue name for listen")
-	flag.StringVar(&config.RabbitServerQueue, "server", "CalculatorServerQueue1", "RabbitMQ queue name for server")
-	flag.StringVar(&config.WorkerID, "worker", "worker", "Optional name of agent")
+	flag.StringVar(&config.RabbitAgentQueue, "server", "CalculatorAgentQueue1", "RabbitMQ queue name for agents")
+	flag.StringVar(&config.AgentID, "agent", "agent", "Name ID of agent")
 	flag.IntVar(&config.Threads, "threads", 5, "Threads count for goroutine")
 	flag.Parse()
 
@@ -37,10 +37,13 @@ func main() {
 	messages, err := broker.ConnQueue(config.RabbitTaskQueue)
 	done := make(chan bool)
 
+	// start threads for solving tasks
 	for i := 0; i < config.Threads; i++ {
-		go agent.Solver(config.RabbitServerQueue, messages)
+		go agent.Solver(config.RabbitAgentQueue, messages)
 	}
+	// start ping method
+	go agent.Ping(config.RabbitAgentQueue, config.AgentID)
 
-	logrus.Infof("Agent \"%s\" was started with %d threads", config.WorkerID, config.Threads)
+	logrus.Infof("Agent \"%s\" was started with %d threads", config.AgentID, config.Threads)
 	<-done
 }
