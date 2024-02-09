@@ -74,7 +74,7 @@ func (t *Task) GetById(taskId int) (TaskModel, error) {
 // Update answer for expression by task id
 func (t *Task) SetAnswer(taskId int, answer string, status string) error {
 	query := "UPDATE tasks SET answer = $1, status = $2 WHERE task_id = $3"
-	if _, err := database.DB.Query(context.Background(), query, answer, status, taskId); err != nil {
+	if _, err := database.DB.Exec(context.Background(), query, answer, status, taskId); err != nil {
 		return err
 	}
 

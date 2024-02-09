@@ -43,7 +43,7 @@ func (a *Agent) GetAllAgents() ([]AgentModel, error) {
 // Create new row with agent
 func (a *Agent) Create(agentId string) error {
 	query := "INSERT INTO agents (agent_id, last_ping) VALUES ($1, $2)"
-	if _, err := database.DB.Query(context.Background(), query, agentId, time.Now()); err != nil {
+	if _, err := database.DB.Exec(context.Background(), query, agentId, time.Now()); err != nil {
 		return err
 	}
 
@@ -53,7 +53,7 @@ func (a *Agent) Create(agentId string) error {
 // Update last ping by agent id
 func (a *Agent) SetLastPing(agentId string) error {
 	query := "UPDATE agents SET last_ping = $1 WHERE agent_id = $2"
-	if _, err := database.DB.Query(context.Background(), query, time.Now(), agentId); err != nil {
+	if _, err := database.DB.Exec(context.Background(), query, time.Now(), agentId); err != nil {
 		return err
 	}
 
