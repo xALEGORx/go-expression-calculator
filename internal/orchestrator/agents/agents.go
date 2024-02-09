@@ -18,6 +18,9 @@ func HandleAgentResponse(messages <-chan amqp.Delivery) {
 		if message.Type == "processed" {
 			HandleProcessed(message)
 		}
+		if message.Type == "error" {
+			HandleError(message)
+		}
 		if message.Type == "ping" {
 			HandlePing(message)
 		}

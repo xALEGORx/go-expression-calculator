@@ -32,11 +32,33 @@ func Solver(queueOrchestrator, agentId string, messages <-chan amqp.Delivery) {
 
 		expression, err := govaluate.NewEvaluableExpression(string(message.Body))
 		if err != nil {
-			logrus.Errorf("Failed load expression task #%s: %s", message.CorrelationId, message.Body)
+			errorMsg := amqp.Publishing{
+				ContentType:   "text/plain",
+				Body:          []byte(err.Error()),
+				Type:          "error",
+				CorrelationId: message.CorrelationId,
+			}
+			if err := rabbitmq.Get().SendToQueue(queueOrchestrator, errorMsg); err != nil {
+				logrus.Fatalf("Failed sent error for task #%s: %s", message.CorrelationId, err.Error())
+				continue
+			}
+
+			logrus.Errorf("Failed load expression task #%s \"%s\": %s", message.CorrelationId, message.Body, err.Error())
 			continue
 		}
-		result, err := expression.Evaluate(nil)
+		result, err := expression.Evaluate(map[string]interface{}{})
 		if err != nil {
+			errorMsg := amqp.Publishing{
+				ContentType:   "text/plain",
+				Body:          []byte(err.Error()),
+				Type:          "error",
+				CorrelationId: message.CorrelationId,
+			}
+			if err := rabbitmq.Get().SendToQueue(queueOrchestrator, errorMsg); err != nil {
+				logrus.Fatalf("Failed sent error for task #%s: %s", message.CorrelationId, err.Error())
+				continue
+			}
+
 			logrus.Errorf("Failed solve the expression %s for task #%s: %s", message.Body, message.CorrelationId, err.Error())
 			continue
 		}
