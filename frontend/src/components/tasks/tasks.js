@@ -45,11 +45,20 @@ export default class Tasks extends Component {
             switch (json.action) {
                 case "new_task":
                     // add new task to list
-                    let newarr = [json.data].concat(currentTasks)
-                    console.log(newarr)
-                    this.setState({ tasks: [...newarr] })
+                    this.setState({ tasks: [...[json.data].concat(currentTasks)] })
                     break;
-            
+                case "update_task":
+                    // update task in list
+
+                    for (let i = 0; i < currentTasks.length; i++) {
+                        if (currentTasks[i].task_id === json.id) {
+                            currentTasks[i] = json.data
+                            break;
+                        }
+                    }
+
+                    this.setState({ tasks: currentTasks })
+                    break;
                 default:
                     break;
             }

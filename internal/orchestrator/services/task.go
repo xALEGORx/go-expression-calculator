@@ -1,6 +1,7 @@
 package services
 
 import (
+	"github.com/sirupsen/logrus"
 	"github.com/streadway/amqp"
 	"github.com/xALEGORx/go-expression-calculator/internal/orchestrator/repositories"
 	"github.com/xALEGORx/go-expression-calculator/pkg/config"
@@ -53,6 +54,30 @@ func (t *Task) Create(expression string) (repositories.TaskModel, error) {
 	}
 
 	return task, nil
+}
+
+func (t *Task) SetAnswer(taskId int, answer, status string) error {
+	if err := repositories.TaskRepository().SetAnswer(taskId, answer, status); err != nil {
+		logrus.Errorf("Failed update a row with task %d: %s", taskId, err.Error())
+		return err
+	}
+
+	task, err := repositories.TaskRepository().GetById(taskId)
+	if err != nil {
+		logrus.Errorf("Failed fetch a row with task by taskId #%d: %s", taskId, err.Error())
+		return err
+	}
+
+	wsData := websocket.WSData{
+		Action: "update_task",
+		Id:     taskId,
+		Data:   task,
+	}
+	if err = websocket.Broadcast(wsData); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // create new task service

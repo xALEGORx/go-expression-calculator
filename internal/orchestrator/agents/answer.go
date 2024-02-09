@@ -4,6 +4,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/streadway/amqp"
 	"github.com/xALEGORx/go-expression-calculator/internal/orchestrator/repositories"
+	"github.com/xALEGORx/go-expression-calculator/internal/orchestrator/services"
 	"strconv"
 )
 
@@ -16,7 +17,7 @@ func HandleAnswer(message amqp.Delivery) {
 	}
 
 	// set answer into database
-	if err = repositories.TaskRepository().SetAnswer(taskId, string(message.Body), repositories.STATUS_COMPLETED); err != nil {
+	if err = services.TaskService().SetAnswer(taskId, string(message.Body), repositories.STATUS_COMPLETED); err != nil {
 		logrus.Errorf("Failed update a row with task %d: %s", taskId, err.Error())
 		return
 	}
