@@ -57,6 +57,7 @@ func main() {
 	messages, err := broker.ConnQueue(config_.RabbitAgentQueue)
 	go agents.HandleAgentResponse(messages)
 	go agents.HandleTimeoutAgents()
+	go orchestrator.ResolveTasks()
 
 	// initialization a gin
 	gin.SetMode(config_.Mode)
@@ -66,7 +67,6 @@ func main() {
 	logrus.Info("Orchestrator was successful started!")
 	// run a server
 	if err = router.Run(config_.ServerAddr); err != nil {
-		logrus.Fatal("database connection failed")
-		return
+		logrus.Fatalf("failed run http server: %s", err.Error())
 	}
 }

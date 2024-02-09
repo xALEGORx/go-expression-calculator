@@ -2,18 +2,22 @@ package repositories
 
 import (
 	"context"
+	"github.com/xALEGORx/go-expression-calculator/pkg/config"
 	"github.com/xALEGORx/go-expression-calculator/pkg/database"
+	"time"
 )
 
 type Task struct {
 }
 
 type TaskModel struct {
-	TaskID     int    `json:"task_id"`
-	Expression string `json:"expression"`
-	Status     string `json:"status"`
-	Answer     string `json:"answer"`
-	AgentID    string `json:"agent_id"`
+	TaskID     int       `json:"task_id"`
+	Expression string    `json:"expression"`
+	Status     string    `json:"status"`
+	Answer     string    `json:"answer"`
+	AgentID    string    `json:"agent_id"`
+	CreatedAt  time.Time `json:"created_at"`
+	UpdatedAt  time.Time `json:"updated_at"`
 }
 
 const (
@@ -35,7 +39,7 @@ func (t *Task) GetAllTasks() ([]TaskModel, error) {
 
 	for rows.Next() {
 		var task TaskModel
-		if err = rows.Scan(&task.TaskID, &task.Expression, &task.Status, &task.Answer, &task.AgentID); err != nil {
+		if err = rows.Scan(&task.TaskID, &task.Expression, &task.Status, &task.Answer, &task.AgentID, &task.CreatedAt, &task.UpdatedAt); err != nil {
 			return nil, err
 		}
 		tasks = append(tasks, task)
@@ -65,7 +69,7 @@ func (t *Task) GetById(taskId int) (TaskModel, error) {
 	var task TaskModel
 
 	query := "SELECT * FROM tasks WHERE task_id = $1"
-	if err := database.DB.QueryRow(context.Background(), query, taskId).Scan(&task.TaskID, &task.Expression, &task.Status, &task.Answer, &task.AgentID); err != nil {
+	if err := database.DB.QueryRow(context.Background(), query, taskId).Scan(&task.TaskID, &task.Expression, &task.Status, &task.Answer, &task.AgentID, &task.CreatedAt, &task.UpdatedAt); err != nil {
 		return task, err
 	}
 
@@ -84,8 +88,45 @@ func (t *Task) SetAnswer(taskId int, answer string, status string) error {
 
 // Update status to processed and set agent_id
 func (t *Task) SetProcessed(taskId int, agentId string) error {
-	query := "UPDATE tasks SET status = $1, agent_id = $2 WHERE task_id = $3"
-	if _, err := database.DB.Exec(context.Background(), query, STATUS_PROCESSED, agentId, taskId); err != nil {
+	query := "UPDATE tasks SET status = $1, agent_id = $2, updated_at = $3 WHERE task_id = $4"
+	if _, err := database.DB.Exec(context.Background(), query, STATUS_PROCESSED, agentId, time.Now(), taskId); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// Get all tasks for resolve
+func (t *Task) GetTasksForResolve() ([]TaskModel, error) {
+	sql := "SELECT * FROM tasks WHERE status = $1 AND updated_at < $2"
+	timeForResolve := time.Now().Add(-time.Duration(config.Get().AgentResolveTime) * time.Second)
+	rows, err := database.DB.Query(context.Background(), sql, STATUS_PROCESSED, timeForResolve)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	tasks := []TaskModel{}
+
+	for rows.Next() {
+		var task TaskModel
+		if err = rows.Scan(&task.TaskID, &task.Expression, &task.Status, &task.Answer, &task.AgentID, &task.CreatedAt, &task.UpdatedAt); err != nil {
+			return nil, err
+		}
+		tasks = append(tasks, task)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return tasks, nil
+}
+
+// Update status to created and unset agent_id
+func (t *Task) SetCreated(taskId int) error {
+	query := "UPDATE tasks SET status = $1, agent_id = $2, updated_at = $3 WHERE task_id = $4"
+	if _, err := database.DB.Exec(context.Background(), query, STATUS_CREATED, "", time.Now(), taskId); err != nil {
 		return err
 	}
 

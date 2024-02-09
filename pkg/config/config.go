@@ -21,8 +21,9 @@ type IConfig struct {
 	RabbitTaskQueue  string
 	RabbitAgentQueue string
 
-	AgentTimeout int
-	AgentPing    int
+	AgentTimeout     int
+	AgentPing        int
+	AgentResolveTime int
 }
 
 var config *IConfig
@@ -56,6 +57,10 @@ func Init() (*IConfig, error) {
 	config.AgentPing, err = strconv.Atoi(getEnv("AGENT_PING", "60"))
 	if err != nil {
 		return nil, errors.New("wrong value for AGENT_PING")
+	}
+	config.AgentResolveTime, err = strconv.Atoi(getEnv("AGENT_RESOLVE_TIME", "600"))
+	if err != nil {
+		return nil, errors.New("wrong value for AGENT_RESOLVE_TIME")
 	}
 
 	return config, nil

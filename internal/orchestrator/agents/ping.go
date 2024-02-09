@@ -48,13 +48,14 @@ func HandlePing(message amqp.Delivery) {
 
 func HandleTimeoutAgents() {
 	// check every second which agents is disconnected
-	ticket := time.NewTicker(time.Second)
+	ticker := time.NewTicker(time.Second)
 	timeout := time.Duration(config.Get().AgentTimeout) * time.Second
 	pingTime := time.Duration(config.Get().AgentPing) * time.Second
+	defer ticker.Stop()
 
 	for {
 		select {
-		case <-ticket.C:
+		case <-ticker.C:
 			for agentID, agent := range agents {
 				if time.Now().Add(-timeout).After(agent.LastPing) {
 					// agent is disconnected more than 10 minutes - delete from database

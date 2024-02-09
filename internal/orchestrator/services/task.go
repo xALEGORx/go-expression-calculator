@@ -104,6 +104,36 @@ func (t *Task) SetProcessed(taskId int, agentId string) error {
 	return nil
 }
 
+func (t *Task) ResolveTask(task repositories.TaskModel) error {
+	message := amqp.Publishing{
+		ContentType:   "text/plain",
+		Body:          []byte(task.Expression),
+		Type:          "task",
+		CorrelationId: strconv.Itoa(task.TaskID),
+	}
+
+	if err := rabbitmq.Get().SendToQueue(config.Get().RabbitTaskQueue, message); err != nil {
+		logrus.Fatalf("Failed send message to rabbitmq: %s", err.Error())
+		return err
+	}
+
+	if err := repositories.TaskRepository().SetCreated(task.TaskID); err != nil {
+		logrus.Errorf("Failed update status to created when resolved for task #%d: %s", task.TaskID, err.Error())
+		return err
+	}
+
+	wsData := websocket.WSData{
+		Action: "update_task",
+		Id:     task.TaskID,
+		Data:   task,
+	}
+	if err := websocket.Broadcast(wsData); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // create new task service
 func TaskService() *Task {
 	return &Task{}

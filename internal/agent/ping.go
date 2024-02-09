@@ -8,11 +8,12 @@ import (
 )
 
 func Ping(queueOrchestrator string, agentId string, pingTime int) {
-	ticket := time.NewTicker(time.Duration(pingTime) * time.Second)
+	ticker := time.NewTicker(time.Duration(pingTime) * time.Second)
+	defer ticker.Stop()
 
 	for {
 		select {
-		case <-ticket.C:
+		case <-ticker.C:
 			answer := amqp.Publishing{
 				ContentType: "text/plain",
 				Body:        []byte(agentId),
