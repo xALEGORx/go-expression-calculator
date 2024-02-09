@@ -6,8 +6,8 @@ import Servers from "./components/servers/servers";
 
 function App() {
     return (
-        <div className="h-screen w-screen px-64 py-16 overflow-x-hidden">
-            <div className="w-full h-full text-white rounded-lg">
+        <div className="h-screen w-screen overflow-x-hidden">
+            <div className="text-white rounded-lg lg:w-[900px] m-auto my-5">
                 <header className="text-black font-semibold text-xl p-5 flex justify-between items-center bg-white mb-5 rounded-md block-shadow">
                     <div className="w-1/2 flex gap-3">
                         <Link to={"/"} className="w-32 text-center rounded-md py-2 text-sm">ЗАДАЧИ</Link>
