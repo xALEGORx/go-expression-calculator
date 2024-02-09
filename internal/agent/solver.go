@@ -9,13 +9,25 @@ import (
 	"time"
 )
 
-func Solver(queueOrchestrator string, messages <-chan amqp.Delivery) {
+func Solver(queueOrchestrator, agentId string, messages <-chan amqp.Delivery) {
 	for message := range messages {
 		if message.Type != "task" {
 			continue
 		}
 
 		logrus.Infof("Received task #%s: %s", message.CorrelationId, message.Body)
+
+		processed := amqp.Publishing{
+			ContentType:   "text/plain",
+			Body:          []byte(agentId),
+			Type:          "processed",
+			CorrelationId: message.CorrelationId,
+		}
+		if err := rabbitmq.Get().SendToQueue(queueOrchestrator, processed); err != nil {
+			logrus.Fatalf("Failed sent status processed for task #%s: %s", message.CorrelationId, err.Error())
+			continue
+		}
+
 		time.Sleep(5 * time.Second) // wait for response
 
 		expression, err := govaluate.NewEvaluableExpression(string(message.Body))
@@ -37,7 +49,7 @@ func Solver(queueOrchestrator string, messages <-chan amqp.Delivery) {
 			CorrelationId: message.CorrelationId,
 		}
 
-		if err := rabbitmq.Get().SendToQueue(queueOrchestrator, answer); err != nil {
+		if err = rabbitmq.Get().SendToQueue(queueOrchestrator, answer); err != nil {
 			logrus.Fatalf("Failed sent answer %s for task #%s: %s", resultByte, message.CorrelationId, err.Error())
 			continue
 		}

@@ -22,5 +22,5 @@ func HandleAnswer(message amqp.Delivery) {
 		return
 	}
 
-	logrus.Printf("Get answer for %s: %s", message.CorrelationId, message.Body)
+	logrus.Infof("Get answer for %s: %s", message.CorrelationId, message.Body)
 }

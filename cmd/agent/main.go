@@ -41,7 +41,7 @@ func main() {
 
 	// start threads for solving tasks
 	for i := 0; i < config.Threads; i++ {
-		go agent.Solver(config.RabbitAgentQueue, messages)
+		go agent.Solver(config.RabbitAgentQueue, config.AgentID, messages)
 	}
 	// start ping method
 	go agent.Ping(config.RabbitAgentQueue, config.AgentID, config.Ping)

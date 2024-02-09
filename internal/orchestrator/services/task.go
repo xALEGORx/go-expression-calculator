@@ -80,6 +80,30 @@ func (t *Task) SetAnswer(taskId int, answer, status string) error {
 	return nil
 }
 
+func (t *Task) SetProcessed(taskId int, agentId string) error {
+	if err := repositories.TaskRepository().SetProcessed(taskId, agentId); err != nil {
+		logrus.Errorf("Failed update a row with task %d: %s", taskId, err.Error())
+		return err
+	}
+
+	task, err := repositories.TaskRepository().GetById(taskId)
+	if err != nil {
+		logrus.Errorf("Failed fetch a row with task by taskId #%d: %s", taskId, err.Error())
+		return err
+	}
+
+	wsData := websocket.WSData{
+		Action: "update_task",
+		Id:     taskId,
+		Data:   task,
+	}
+	if err = websocket.Broadcast(wsData); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // create new task service
 func TaskService() *Task {
 	return &Task{}
