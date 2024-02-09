@@ -31,6 +31,7 @@ func InitRouter(router *gin.Engine) *gin.Engine {
 		{
 			agent := &handler.Agent{Route: v1.Group("/agent")}
 			agent.Route.GET("", agent.Index)
+			agent.Route.GET("/ws", agent.WebSocket)
 		}
 	}
 

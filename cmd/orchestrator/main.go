@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
+	"github.com/xALEGORx/go-expression-calculator/internal/orchestrator"
 	"github.com/xALEGORx/go-expression-calculator/internal/orchestrator/agents"
 	"github.com/xALEGORx/go-expression-calculator/internal/orchestrator/routes"
 	"github.com/xALEGORx/go-expression-calculator/pkg/config"
@@ -23,7 +24,11 @@ func main() {
 
 	// try to connect to database
 	if err := database.Init(); err != nil {
-		logrus.Fatal("database connection failed")
+		logrus.Fatalf("database connection failed: %s", err.Error())
+		return
+	}
+	if err := orchestrator.PrepareDatabase(); err != nil {
+		logrus.Fatal("database prepare sql failed: %s", err.Error())
 		return
 	}
 

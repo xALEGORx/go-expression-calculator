@@ -5,6 +5,7 @@ import (
 	"github.com/xALEGORx/go-expression-calculator/internal/orchestrator/repositories"
 	"github.com/xALEGORx/go-expression-calculator/pkg/config"
 	"github.com/xALEGORx/go-expression-calculator/pkg/rabbitmq"
+	"github.com/xALEGORx/go-expression-calculator/pkg/websocket"
 	"strconv"
 )
 
@@ -32,10 +33,23 @@ func (t *Task) Create(expression string) (repositories.TaskModel, error) {
 		return repositories.TaskModel{}, err
 	}
 
+	// return task model for response
+
 	task := repositories.TaskModel{
 		TaskID:     taskId,
 		Status:     repositories.STATUS_CREATED,
 		Expression: expression,
+	}
+
+	// send message to websocket
+
+	wsData := websocket.WSData{
+		Action: "new_task",
+		Id:     taskId,
+		Data:   task,
+	}
+	if err = websocket.Broadcast(wsData); err != nil {
+		return repositories.TaskModel{}, err
 	}
 
 	return task, nil

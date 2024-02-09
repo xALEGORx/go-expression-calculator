@@ -13,6 +13,8 @@ export default class Tasks extends Component {
 
         this.handleAddTask = this.handleAddTask.bind(this);
         this.getTaskList = this.getTaskList.bind(this);
+
+        this.socket = new WebSocket(`ws://${process.env.REACT_APP_API_SERVER}/api/v1/agent/ws`);
     }
 
     handleExpressionChange = (event) => {
@@ -22,9 +24,7 @@ export default class Tasks extends Component {
     handleAddTask() {
         this.setState({ expression: "" })
 
-        apiService.addTask(this.state.expression).then((response) => {
-            this.getTaskList()
-        })
+        apiService.addTask(this.state.expression)
     }
 
     getTaskList() {
@@ -38,13 +38,22 @@ export default class Tasks extends Component {
     componentDidMount() {
         this.getTaskList()
 
-        this.interval = setInterval(() => {
-            this.getTaskList()
-        }, 1000);
-    }
-
-    componentWillUnmount() {
-      clearInterval(this.interval);
+        this.socket.onmessage = (event) => {
+            const response = event.data;
+            let json = JSON.parse(response)
+            let currentTasks = this.state.tasks
+            switch (json.action) {
+                case "new_task":
+                    // add new task to list
+                    let newarr = [json.data].concat(currentTasks)
+                    console.log(newarr)
+                    this.setState({ tasks: [...newarr] })
+                    break;
+            
+                default:
+                    break;
+            }
+        }
     }
 
     render() {
@@ -60,7 +69,7 @@ export default class Tasks extends Component {
                     <div className="flex flex-col gap-2">
                         {this.state.tasks.map(task => {
                             return (
-                                <Task key={task.task_id} task={task} />
+                                <Task task={task} />
                             )
                         })}
                     </div>

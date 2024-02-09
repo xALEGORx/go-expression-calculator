@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'http://127.0.0.1:8000/api/v1/';
+const API_URL = `http://${process.env.REACT_APP_API_SERVER}/api/v1/`;
 
 class ApiService {
   getTasks() {

@@ -10,7 +10,6 @@ services:
       POSTGRES_PASSWORD: test12345
       POSTGRES_USER: calculator
     volumes:
-      - ./init.sql:/docker-entrypoint-initdb.d/database.sql
       - ./database:/var/lib/postgresql/data
     ports:
       - 5432:5432
