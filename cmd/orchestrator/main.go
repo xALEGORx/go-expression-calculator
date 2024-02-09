@@ -20,14 +20,18 @@ func main() {
 	// initialization a logrus
 	logger.Init()
 	// parsing .env file to config struct
-	config_ := config.Init()
+	config_, err := config.Init()
+	if err != nil {
+		logrus.Fatalf("failed parse config .env: %s", err.Error())
+		return
+	}
 
 	// try to connect to database
-	if err := database.Init(); err != nil {
+	if err = database.Init(); err != nil {
 		logrus.Fatalf("database connection failed: %s", err.Error())
 		return
 	}
-	if err := orchestrator.PrepareDatabase(); err != nil {
+	if err = orchestrator.PrepareDatabase(); err != nil {
 		logrus.Fatal("database prepare sql failed: %s", err.Error())
 		return
 	}
@@ -52,6 +56,7 @@ func main() {
 	// start listen a responses from agents
 	messages, err := broker.ConnQueue(config_.RabbitAgentQueue)
 	go agents.HandleAgentResponse(messages)
+	go agents.HandleTimeoutAgents()
 
 	// initialization a gin
 	gin.SetMode(config_.Mode)

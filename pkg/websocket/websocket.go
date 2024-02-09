@@ -10,7 +10,7 @@ import (
 
 type WSData struct {
 	Action string      `json:"action"`
-	Id     int         `json:"id"`
+	Id     interface{} `json:"id"`
 	Data   interface{} `json:"data"`
 }
 

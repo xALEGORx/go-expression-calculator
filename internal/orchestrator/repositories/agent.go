@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"context"
+	"github.com/xALEGORx/go-expression-calculator/pkg/config"
 	"time"
 
 	"github.com/xALEGORx/go-expression-calculator/pkg/database"
@@ -13,7 +14,14 @@ type Agent struct {
 type AgentModel struct {
 	AgentID  string    `json:"agent_id"`
 	LastPing time.Time `json:"last_ping"`
+	Status   string    `json:"status"`
 }
+
+const (
+	AGENT_CONNECTED    = "connected"
+	AGENT_DISCONNECTED = "disconnected"
+	AGENT_DELETED      = "deleted"
+)
 
 // Get all agents in database
 func (a *Agent) GetAllAgents() ([]AgentModel, error) {
@@ -30,6 +38,13 @@ func (a *Agent) GetAllAgents() ([]AgentModel, error) {
 		if err = rows.Scan(&agent.AgentID, &agent.LastPing); err != nil {
 			return nil, err
 		}
+
+		if time.Now().Add(-time.Duration(config.Get().AgentPing) * time.Second).After(agent.LastPing) {
+			agent.Status = AGENT_DISCONNECTED
+		} else {
+			agent.Status = AGENT_CONNECTED
+		}
+
 		agents = append(agents, agent)
 	}
 
@@ -54,6 +69,16 @@ func (a *Agent) Create(agentId string) error {
 func (a *Agent) SetLastPing(agentId string) error {
 	query := "UPDATE agents SET last_ping = $1 WHERE agent_id = $2"
 	if _, err := database.DB.Exec(context.Background(), query, time.Now(), agentId); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// Delete agent by agent id
+func (a *Agent) Delete(agentId string) error {
+	query := "DELETE FROM agents WHERE agent_id = $1"
+	if _, err := database.DB.Exec(context.Background(), query, agentId); err != nil {
 		return err
 	}
 

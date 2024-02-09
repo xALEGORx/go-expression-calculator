@@ -1,8 +1,10 @@
 package config
 
 import (
+	"errors"
 	"github.com/joho/godotenv"
 	"os"
+	"strconv"
 )
 
 type IConfig struct {
@@ -18,12 +20,19 @@ type IConfig struct {
 	RabbitURL        string
 	RabbitTaskQueue  string
 	RabbitAgentQueue string
+
+	AgentTimeout int
+	AgentPing    int
 }
 
 var config *IConfig
 
-func Init() *IConfig {
-	godotenv.Load()
+func Init() (*IConfig, error) {
+	var err error
+	err = godotenv.Load()
+	if err != nil {
+		return nil, err
+	}
 
 	config = &IConfig{
 		ServerAddr: getEnv("SERVER_ADDR", "localhost:8080"),
@@ -40,7 +49,16 @@ func Init() *IConfig {
 		RabbitAgentQueue: getEnv("RABBIT_AGENT_QUEUE", "CalculatorAgentQueue1"),
 	}
 
-	return config
+	config.AgentTimeout, err = strconv.Atoi(getEnv("AGENT_TIMEOUT", "600"))
+	if err != nil {
+		return nil, errors.New("wrong value for AGENT_TIMEOUT")
+	}
+	config.AgentPing, err = strconv.Atoi(getEnv("AGENT_PING", "60"))
+	if err != nil {
+		return nil, errors.New("wrong value for AGENT_PING")
+	}
+
+	return config, nil
 }
 
 func Get() *IConfig {

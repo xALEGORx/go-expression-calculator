@@ -7,10 +7,12 @@ import (
 	"time"
 )
 
-func Ping(queueOrchestrator string, agentId string) {
+func Ping(queueOrchestrator string, agentId string, pingTime int) {
+	ticket := time.NewTicker(time.Duration(pingTime) * time.Second)
+
 	for {
 		select {
-		case <-time.After(time.Minute):
+		case <-ticket.C:
 			answer := amqp.Publishing{
 				ContentType: "text/plain",
 				Body:        []byte(agentId),

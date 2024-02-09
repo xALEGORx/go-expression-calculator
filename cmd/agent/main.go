@@ -14,6 +14,7 @@ type IConfig struct {
 	RabbitTaskQueue  string
 	RabbitAgentQueue string
 	Threads          int
+	Ping             int
 }
 
 func main() {
@@ -23,6 +24,7 @@ func main() {
 	flag.StringVar(&config.RabbitAgentQueue, "server", "CalculatorAgentQueue1", "RabbitMQ queue name for agents")
 	flag.StringVar(&config.AgentID, "agent", "agent", "Name ID of agent")
 	flag.IntVar(&config.Threads, "threads", 5, "Threads count for goroutine")
+	flag.IntVar(&config.Ping, "ping", 60, "Ping time in seconds")
 	flag.Parse()
 
 	// initialization a logrus
@@ -42,7 +44,7 @@ func main() {
 		go agent.Solver(config.RabbitAgentQueue, messages)
 	}
 	// start ping method
-	go agent.Ping(config.RabbitAgentQueue, config.AgentID)
+	go agent.Ping(config.RabbitAgentQueue, config.AgentID, config.Ping)
 
 	logrus.Infof("Agent \"%s\" was started with %d threads", config.AgentID, config.Threads)
 	<-done
