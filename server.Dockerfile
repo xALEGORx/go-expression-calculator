@@ -1,23 +1,12 @@
-FROM node:16-alpine
-WORKDIR /app
-COPY frontend/package*.json ./
-RUN npm install
-COPY frontend ./
-RUN npm run build
-
-FROM nginx:alpine
-COPY --from=0 /app/build /usr/share/nginx/html
-EXPOSE 80
-CMD ["nginx", "-g", "daemon off;"]
-
 FROM golang:1.20 AS orchestrator
 WORKDIR /app
+COPY .env ./
 COPY go.* ./
-COPY internal ./internal
+COPY internal/orchestrator ./internal/orchestrator
+COPY pkg ./pkg
+COPY docs ./docs
 RUN go mod download
 COPY cmd/orchestrator ./
-RUN CGO_ENABLED=0 GOOS=linux go build -o orchestrator .
-
-FROM scratch
-COPY --from=orchestrator /app /orchestrator
-CMD ["/orchestrator"]
+RUN go build -o orchestrator .
+EXPOSE 8000
+CMD ["./orchestrator"]
