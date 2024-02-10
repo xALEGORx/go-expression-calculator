@@ -24,7 +24,7 @@ export default function Task({ task }) {
             </div>
             <div>
                 <span className="text-completed"></span>
-                <span className="text-gray text-sm">07.02.2024 00:21:27</span>
+                <span className="text-gray text-sm">{task.created_at}</span>
             </div>
         </div>
     )
@@ -37,7 +37,10 @@ function prepareStatus(task) {
         case "processed":
             return `В процессе (Агент ${task.agent_id})`
         case "completed":
-            return "Завершен"
+            let createdAt = new Date(task.created_at)
+            let updatedAt = new Date(task.updated_at)
+            let completeTime = (updatedAt.getTime() - createdAt.getTime()) / 1000
+            return `Завершен за ${completeTime} секунд`
         case "fail":
             return "Ошибка"
         default:

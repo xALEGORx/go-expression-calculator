@@ -32,7 +32,7 @@ func main() {
 		return
 	}
 	if err = orchestrator.PrepareDatabase(); err != nil {
-		logrus.Fatal("database prepare sql failed: %s", err.Error())
+		logrus.Fatalf("database prepare sql failed: %s", err.Error())
 		return
 	}
 
