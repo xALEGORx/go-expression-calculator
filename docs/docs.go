@@ -15,6 +15,44 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/agent": {
+            "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Agent"
+                ],
+                "summary": "Get all agents",
+                "operationId": "agent-index",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/repositories.AgentModel"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
         "/task": {
             "get": {
                 "consumes": [
@@ -24,7 +62,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Task"
+                    "Worker"
                 ],
                 "summary": "Get all tasks",
                 "operationId": "task-index",
@@ -42,7 +80,7 @@ const docTemplate = `{
                                         "data": {
                                             "type": "array",
                                             "items": {
-                                                "$ref": "#/definitions/repositories.TaskModel"
+                                                "$ref": "#/definitions/repositories.AgentModel"
                                             }
                                         }
                                     }
@@ -60,7 +98,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Task"
+                    "Worker"
                 ],
                 "summary": "Create task",
                 "operationId": "task-store",
@@ -87,7 +125,7 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/repositories.TaskModel"
+                                            "$ref": "#/definitions/repositories.AgentModel"
                                         }
                                     }
                                 }
@@ -106,7 +144,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Task"
+                    "Worker"
                 ],
                 "summary": "Get all tasks",
                 "operationId": "task-show",
@@ -122,7 +160,7 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/repositories.TaskModel"
+                                            "$ref": "#/definitions/repositories.AgentModel"
                                         }
                                     }
                                 }
@@ -145,20 +183,17 @@ const docTemplate = `{
                 }
             }
         },
-        "repositories.TaskModel": {
+        "repositories.AgentModel": {
             "type": "object",
             "properties": {
-                "error": {
+                "agent_id": {
                     "type": "string"
                 },
-                "expression": {
+                "last_ping": {
                     "type": "string"
                 },
                 "status": {
                     "type": "string"
-                },
-                "task_id": {
-                    "type": "integer"
                 }
             }
         },

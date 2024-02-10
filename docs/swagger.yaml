@@ -7,16 +7,14 @@ definitions:
     required:
     - expression
     type: object
-  repositories.TaskModel:
+  repositories.AgentModel:
     properties:
-      error:
+      agent_id:
         type: string
-      expression:
+      last_ping:
         type: string
       status:
         type: string
-      task_id:
-        type: integer
     type: object
   response.SuccessResponse:
     properties:
@@ -32,6 +30,28 @@ info:
   title: Expression Calculator
   version: "1.0"
 paths:
+  /agent:
+    get:
+      consumes:
+      - application/json
+      operationId: agent-index
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.SuccessResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/repositories.AgentModel'
+                  type: array
+              type: object
+      summary: Get all agents
+      tags:
+      - Agent
   /task:
     get:
       consumes:
@@ -48,12 +68,12 @@ paths:
             - properties:
                 data:
                   items:
-                    $ref: '#/definitions/repositories.TaskModel'
+                    $ref: '#/definitions/repositories.AgentModel'
                   type: array
               type: object
       summary: Get all tasks
       tags:
-      - Task
+      - Worker
     post:
       consumes:
       - application/json
@@ -75,11 +95,11 @@ paths:
             - $ref: '#/definitions/response.SuccessResponse'
             - properties:
                 data:
-                  $ref: '#/definitions/repositories.TaskModel'
+                  $ref: '#/definitions/repositories.AgentModel'
               type: object
       summary: Create task
       tags:
-      - Task
+      - Worker
   /task/:id:
     get:
       consumes:
@@ -95,9 +115,9 @@ paths:
             - $ref: '#/definitions/response.SuccessResponse'
             - properties:
                 data:
-                  $ref: '#/definitions/repositories.TaskModel'
+                  $ref: '#/definitions/repositories.AgentModel'
               type: object
       summary: Get all tasks
       tags:
-      - Task
+      - Worker
 swagger: "2.0"

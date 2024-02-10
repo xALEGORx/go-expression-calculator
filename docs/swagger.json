@@ -8,6 +8,44 @@
     },
     "basePath": "/api/v1",
     "paths": {
+        "/agent": {
+            "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Agent"
+                ],
+                "summary": "Get all agents",
+                "operationId": "agent-index",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/repositories.AgentModel"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
         "/task": {
             "get": {
                 "consumes": [
@@ -17,7 +55,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "Task"
+                    "Worker"
                 ],
                 "summary": "Get all tasks",
                 "operationId": "task-index",
@@ -35,7 +73,7 @@
                                         "data": {
                                             "type": "array",
                                             "items": {
-                                                "$ref": "#/definitions/repositories.TaskModel"
+                                                "$ref": "#/definitions/repositories.AgentModel"
                                             }
                                         }
                                     }
@@ -53,7 +91,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "Task"
+                    "Worker"
                 ],
                 "summary": "Create task",
                 "operationId": "task-store",
@@ -80,7 +118,7 @@
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/repositories.TaskModel"
+                                            "$ref": "#/definitions/repositories.AgentModel"
                                         }
                                     }
                                 }
@@ -99,7 +137,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "Task"
+                    "Worker"
                 ],
                 "summary": "Get all tasks",
                 "operationId": "task-show",
@@ -115,7 +153,7 @@
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/repositories.TaskModel"
+                                            "$ref": "#/definitions/repositories.AgentModel"
                                         }
                                     }
                                 }
@@ -138,20 +176,17 @@
                 }
             }
         },
-        "repositories.TaskModel": {
+        "repositories.AgentModel": {
             "type": "object",
             "properties": {
-                "error": {
+                "agent_id": {
                     "type": "string"
                 },
-                "expression": {
+                "last_ping": {
                     "type": "string"
                 },
                 "status": {
                     "type": "string"
-                },
-                "task_id": {
-                    "type": "integer"
                 }
             }
         },

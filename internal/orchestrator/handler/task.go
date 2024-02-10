@@ -21,7 +21,7 @@ type TaskCreateRequest struct {
 // @ID task-index
 // @Accept json
 // @Produce json
-// @Success 200 {object} response.SuccessResponse{data=[]repositories.WorkerModel}
+// @Success 200 {object} response.SuccessResponse{data=[]repositories.AgentModel}
 // @Router /task [get]
 func (p *Task) Index(ctx *gin.Context) {
 	tasks, err := repositories.TaskRepository().GetAllTasks()
@@ -39,7 +39,7 @@ func (p *Task) Index(ctx *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param input body TaskCreateRequest true "fields"
-// @Success 200 {object} response.SuccessResponse{data=repositories.WorkerModel}
+// @Success 200 {object} response.SuccessResponse{data=repositories.AgentModel}
 // @Router /task [post]
 func (p *Task) Store(ctx *gin.Context) {
 	var request TaskCreateRequest
@@ -63,7 +63,7 @@ func (p *Task) Store(ctx *gin.Context) {
 // @ID task-show
 // @Accept json
 // @Produce json
-// @Success 200 {object} response.SuccessResponse{data=repositories.WorkerModel}
+// @Success 200 {object} response.SuccessResponse{data=repositories.AgentModel}
 // @Router /task/:id [get]
 func (p *Task) Show(ctx *gin.Context) {
 	taskIdUrl := ctx.Param("id")
