@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-func Solver(queueOrchestrator, agentId string, messages <-chan amqp.Delivery) {
+func Solver(queueOrchestrator, agentId string, wait int, messages <-chan amqp.Delivery) {
 	for message := range messages {
 		if message.Type != "task" {
 			continue
@@ -28,7 +28,7 @@ func Solver(queueOrchestrator, agentId string, messages <-chan amqp.Delivery) {
 			continue
 		}
 
-		time.Sleep(5 * time.Second) // wait for response
+		time.Sleep(time.Duration(wait) * time.Second) // wait for response
 
 		expression, err := govaluate.NewEvaluableExpression(string(message.Body))
 		if err != nil {

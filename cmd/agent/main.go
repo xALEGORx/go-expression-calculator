@@ -15,6 +15,7 @@ type IConfig struct {
 	RabbitAgentQueue string
 	Threads          int
 	Ping             int
+	Wait             int
 }
 
 func main() {
@@ -25,6 +26,7 @@ func main() {
 	flag.StringVar(&config.AgentID, "agent", "agent", "Name ID of agent")
 	flag.IntVar(&config.Threads, "threads", 5, "Threads count for goroutine")
 	flag.IntVar(&config.Ping, "ping", 60, "Ping time in seconds")
+	flag.IntVar(&config.Wait, "wait", 5, "Wait time (emulating long query)")
 	flag.Parse()
 
 	// initialization a logrus
@@ -41,7 +43,7 @@ func main() {
 
 	// start threads for solving tasks
 	for i := 0; i < config.Threads; i++ {
-		go agent.Solver(config.RabbitAgentQueue, config.AgentID, messages)
+		go agent.Solver(config.RabbitAgentQueue, config.AgentID, config.Wait, messages)
 	}
 	// start ping method
 	go agent.Ping(config.RabbitAgentQueue, config.AgentID, config.Ping)
