@@ -9,10 +9,43 @@ export default class Servers extends Component {
         this.state = {
             agents: []
         };
+
+        this.socket = new WebSocket(`ws://${process.env.REACT_APP_API_SERVER}/api/v1/agent/ws`);
     }
 
     componentDidMount() {
         this.getAgentList()
+
+        this.socket.onmessage = (event) => {
+            const response = event.data;
+            let json = JSON.parse(response)
+            let currentAgents = this.state.agents
+            console.log(json)
+            if (json.action == "update_agent") {
+                let flag = false;
+
+                if (json.data.status == "deleted") {
+                    flag = true;
+                    let deletedAgents = currentAgents.filter((currentAgent) => currentAgent.agent_id != json.data.agent_id)
+                    currentAgents = deletedAgents
+                } else {
+                    for (let i = 0; i < currentAgents.length; i++) {
+                        if (currentAgents[i].agent_id === json.id) {
+                            flag = true;
+                            currentAgents[i] = json.data
+                            break;
+                        }
+                    }
+                }
+
+                if (!flag) {
+                    // is new agent
+                    currentAgents.push(json.data)
+                }
+
+                this.setState({ agents: currentAgents })
+            }
+        }
     }
 
     getAgentList() {
