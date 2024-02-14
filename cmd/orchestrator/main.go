@@ -37,7 +37,7 @@ func main() {
 	}
 
 	// try to connect to rabbitmq
-	broker, err := rabbitmq.Init(config_.RabbitURL)
+	broker, err := rabbitmq.Init(config_.RabbitDSN)
 	if err != nil {
 		logrus.Fatal("rabbitmq connection failed")
 		return

@@ -2,7 +2,9 @@ package config
 
 import (
 	"errors"
+	"fmt"
 	"github.com/joho/godotenv"
+	"github.com/sirupsen/logrus"
 	"os"
 	"strconv"
 )
@@ -17,9 +19,13 @@ type IConfig struct {
 	PostgresPort     string
 	PostgresDatabase string
 
-	RabbitURL        string
+	RabbitUser       string
+	RabbitPassword   string
+	RabbitHost       string
+	RabbitPort       string
 	RabbitTaskQueue  string
 	RabbitAgentQueue string
+	RabbitDSN        string
 
 	AgentTimeout     int
 	AgentPing        int
@@ -30,8 +36,8 @@ var config *IConfig
 
 func Init() (*IConfig, error) {
 	var err error
-	err = godotenv.Load()
-	if err != nil {
+
+	if err = godotenv.Load(); err != nil {
 		return nil, err
 	}
 
@@ -45,7 +51,10 @@ func Init() (*IConfig, error) {
 		PostgresPort:     getEnv("POSTGRES_PORT", "5432"),
 		PostgresDatabase: getEnv("POSTGRES_DATABASE", "calculator"),
 
-		RabbitURL:        getEnv("RABBIT_URL", "amqp://guest:guest@localhost:5672"),
+		RabbitUser:       getEnv("RABBIT_USER", "guest"),
+		RabbitPassword:   getEnv("RABBIT_PASSWORD", "guest"),
+		RabbitHost:       getEnv("RABBIT_HOST", "localhost"),
+		RabbitPort:       getEnv("RABBIT_PORT", "5672"),
 		RabbitTaskQueue:  getEnv("RABBIT_TASK_QUEUE", "CalculatorTaskQueue1"),
 		RabbitAgentQueue: getEnv("RABBIT_AGENT_QUEUE", "CalculatorAgentQueue1"),
 	}
@@ -63,6 +72,8 @@ func Init() (*IConfig, error) {
 		return nil, errors.New("wrong value for AGENT_RESOLVE_TIME")
 	}
 
+	config.RabbitDSN = fmt.Sprintf("amqp://%s:%s@%s:%s", config.RabbitUser, config.RabbitPassword, config.RabbitHost, config.RabbitPort)
+
 	return config, nil
 }
 
@@ -74,5 +85,7 @@ func getEnv(key string, defaultVal string) string {
 	if value, exists := os.LookupEnv(key); exists {
 		return value
 	}
+
+	logrus.Errorf("value from .env for \"%s\" doesn't found, set default value: %s", key, defaultVal)
 	return defaultVal
 }
