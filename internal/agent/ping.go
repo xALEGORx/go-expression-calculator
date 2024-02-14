@@ -18,6 +18,7 @@ func Ping(queueOrchestrator string, agentId string, pingTime int) {
 				ContentType: "text/plain",
 				Body:        []byte(agentId),
 				Type:        "ping",
+				Timestamp:   time.Now(),
 			}
 
 			if err := rabbitmq.Get().SendToQueue(queueOrchestrator, answer); err != nil {

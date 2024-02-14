@@ -66,9 +66,9 @@ func (a *Agent) Create(agentId string) error {
 }
 
 // Update last ping by agent id
-func (a *Agent) SetLastPing(agentId string) error {
+func (a *Agent) SetLastPing(agentId string, ping time.Time) error {
 	query := "UPDATE agents SET last_ping = $1 WHERE agent_id = $2"
-	if _, err := database.DB.Exec(context.Background(), query, time.Now(), agentId); err != nil {
+	if _, err := database.DB.Exec(context.Background(), query, ping, agentId); err != nil {
 		return err
 	}
 

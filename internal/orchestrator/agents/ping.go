@@ -13,6 +13,13 @@ var agents = make(map[string]*repositories.AgentModel)
 
 func HandlePing(message amqp.Delivery) {
 	// handle ping from agent (create row or update last_ping)
+	timeout := time.Duration(config.Get().AgentTimeout) * time.Second
+	if time.Since(message.Timestamp) >= timeout {
+		// outdated ping message
+		logrus.Debugf("outdated message for ping %s", message.Body)
+		return
+	}
+
 	agent := string(message.Body)
 	_, ok := agents[agent]
 
@@ -25,7 +32,7 @@ func HandlePing(message amqp.Delivery) {
 
 		agents[agent] = &repositories.AgentModel{
 			AgentID:  agent,
-			LastPing: time.Now(),
+			LastPing: message.Timestamp,
 			Status:   repositories.AGENT_CONNECTED,
 		}
 		sendToWebsocket(*agents[agent])
@@ -33,14 +40,14 @@ func HandlePing(message amqp.Delivery) {
 		logrus.Infof("Connected new agent #%s", agent)
 	}
 
-	if err := repositories.AgentRepository().SetLastPing(agent); err != nil {
+	if err := repositories.AgentRepository().SetLastPing(agent, message.Timestamp); err != nil {
 		// error in update database
 		logrus.Fatalf("Failed update a last ping for %s: %s", agent, err.Error())
 		return
 	}
 
 	if ok {
-		agents[agent].LastPing = time.Now()
+		agents[agent].LastPing = message.Timestamp
 	}
 
 	logrus.Debugf("Update last ping for %s", agent)

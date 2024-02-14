@@ -8,6 +8,7 @@ import (
 	"github.com/xALEGORx/go-expression-calculator/pkg/rabbitmq"
 	"github.com/xALEGORx/go-expression-calculator/pkg/websocket"
 	"strconv"
+	"time"
 )
 
 type Task struct {
@@ -40,6 +41,8 @@ func (t *Task) Create(expression string) (repositories.TaskModel, error) {
 		TaskID:     taskId,
 		Status:     repositories.STATUS_CREATED,
 		Expression: expression,
+		CreatedAt:  time.Now(),
+		UpdatedAt:  time.Now(),
 	}
 
 	// send message to websocket
