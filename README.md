@@ -42,6 +42,9 @@
 
 [![GoLang][GoLang]][GoLang-url] [![React][React.js]][React-url] [![Postgres][Postgres]][Postgres-url] [![Rabbit][Rabbit]][Rabbit-url]
 
+![image](https://github.com/xALEGORx/go-expression-calculator/assets/26199734/01cece11-7535-44a7-9d2e-01d7922f9ba2)
+
+
 
 ## Как запустить проект?
 
