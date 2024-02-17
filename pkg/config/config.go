@@ -1,7 +1,6 @@
 package config
 
 import (
-	"errors"
 	"fmt"
 	"github.com/joho/godotenv"
 	"github.com/sirupsen/logrus"
@@ -57,21 +56,13 @@ func Init() (*IConfig, error) {
 		RabbitPort:       getEnv("RABBIT_PORT", "5672"),
 		RabbitTaskQueue:  getEnv("RABBIT_TASK_QUEUE", "CalculatorTaskQueue1"),
 		RabbitAgentQueue: getEnv("RABBIT_AGENT_QUEUE", "CalculatorAgentQueue1"),
+
+		AgentTimeout:     getEnvInt("AGENT_TIMEOUT", 600),
+		AgentPing:        getEnvInt("AGENT_PING", 60),
+		AgentResolveTime: getEnvInt("AGENT_RESOLVE_TIME", 600),
 	}
 
-	config.AgentTimeout, err = strconv.Atoi(getEnv("AGENT_TIMEOUT", "600"))
-	if err != nil {
-		return nil, errors.New("wrong value for AGENT_TIMEOUT")
-	}
-	config.AgentPing, err = strconv.Atoi(getEnv("AGENT_PING", "60"))
-	if err != nil {
-		return nil, errors.New("wrong value for AGENT_PING")
-	}
-	config.AgentResolveTime, err = strconv.Atoi(getEnv("AGENT_RESOLVE_TIME", "600"))
-	if err != nil {
-		return nil, errors.New("wrong value for AGENT_RESOLVE_TIME")
-	}
-
+	// build a dsn connection string for RabbitMQ
 	config.RabbitDSN = fmt.Sprintf("amqp://%s:%s@%s:%s", config.RabbitUser, config.RabbitPassword, config.RabbitHost, config.RabbitPort)
 
 	return config, nil
@@ -87,5 +78,19 @@ func getEnv(key string, defaultVal string) string {
 	}
 
 	logrus.Errorf("value from .env for \"%s\" doesn't found, set default value: %s", key, defaultVal)
+	return defaultVal
+}
+
+func getEnvInt(key string, defaultVal int) int {
+	if value, exists := os.LookupEnv(key); exists {
+		valueInt, err := strconv.Atoi(value)
+		if err != nil {
+			logrus.Errorf("value from .env for \"%s\" isn't integer, set default value: %d", key, defaultVal)
+			return defaultVal
+		}
+		return valueInt
+	}
+
+	logrus.Errorf("value from .env for \"%s\" doesn't found, set default value: %d", key, defaultVal)
 	return defaultVal
 }
