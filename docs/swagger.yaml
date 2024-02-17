@@ -117,7 +117,7 @@ paths:
                 data:
                   $ref: '#/definitions/repositories.AgentModel'
               type: object
-      summary: Get all tasks
+      summary: Get task by id
       tags:
       - Worker
 swagger: "2.0"

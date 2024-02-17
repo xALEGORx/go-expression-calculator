@@ -58,7 +58,7 @@ func (p *Task) Store(ctx *gin.Context) {
 	response.Data(ctx, task)
 }
 
-// @Summary Get all tasks
+// @Summary Get task by id
 // @Tags Worker
 // @ID task-show
 // @Accept json

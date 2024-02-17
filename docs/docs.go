@@ -146,7 +146,7 @@ const docTemplate = `{
                 "tags": [
                     "Worker"
                 ],
-                "summary": "Get all tasks",
+                "summary": "Get task by id",
                 "operationId": "task-show",
                 "responses": {
                     "200": {
