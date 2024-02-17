@@ -47,6 +47,7 @@ func Solver(queueOrchestrator, agentId string, wait int, messages <-chan amqp.De
 			continue
 		}
 		result, err := expression.Evaluate(map[string]interface{}{})
+
 		if err != nil {
 			errorMsg := amqp.Publishing{
 				ContentType:   "text/plain",

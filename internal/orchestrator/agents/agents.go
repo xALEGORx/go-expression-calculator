@@ -12,6 +12,8 @@ func HandleAgentResponse(messages <-chan amqp.Delivery) {
 	}
 
 	for message := range messages {
+		logrus.Debugf("[rabbitmq] received message type of \"%s\" with body: \"%s\"", message.Type, message.Body)
+
 		if message.Type == "answer" {
 			HandleAnswer(message)
 		}

@@ -3,6 +3,7 @@ package logger
 import (
 	"github.com/sirupsen/logrus"
 	easy "github.com/t-tomalak/logrus-easy-formatter"
+	"github.com/xALEGORx/go-expression-calculator/pkg/config"
 	"os"
 )
 
@@ -12,5 +13,10 @@ func Init() {
 		TimestampFormat: "2006-01-02 15:04:05",
 		LogFormat:       "[%lvl%]: %time% - %msg%\n",
 	})
-	logrus.SetLevel(logrus.InfoLevel)
+
+	if config.Get().Mode == "debug" {
+		logrus.SetLevel(logrus.DebugLevel)
+	} else {
+		logrus.SetLevel(logrus.InfoLevel)
+	}
 }

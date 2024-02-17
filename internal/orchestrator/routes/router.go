@@ -7,6 +7,7 @@ import (
 	_ "github.com/xALEGORx/go-expression-calculator/docs"
 	"github.com/xALEGORx/go-expression-calculator/internal/orchestrator/handler"
 	"github.com/xALEGORx/go-expression-calculator/internal/orchestrator/middlewares"
+	"github.com/xALEGORx/go-expression-calculator/pkg/config"
 	"net/http"
 )
 
@@ -35,7 +36,9 @@ func InitRouter(router *gin.Engine) *gin.Engine {
 		}
 	}
 
-	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler, ginSwagger.DefaultModelsExpandDepth(-1)))
+	if config.Get().Mode == "debug" {
+		router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler, ginSwagger.DefaultModelsExpandDepth(-1)))
+	}
 
 	return router
 }

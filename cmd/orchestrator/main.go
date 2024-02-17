@@ -25,6 +25,7 @@ func main() {
 		logrus.Fatalf("failed parse config .env: %s", err.Error())
 		return
 	}
+	logrus.Debug("config was successful loaded")
 
 	// try to connect to database
 	if err = database.Init(); err != nil {
@@ -35,6 +36,7 @@ func main() {
 		logrus.Fatalf("database prepare sql failed: %s", err.Error())
 		return
 	}
+	logrus.Debug("database was successful loaded & prepared")
 
 	// try to connect to rabbitmq
 	broker, err := rabbitmq.Init(config_.RabbitDSN)
@@ -52,6 +54,7 @@ func main() {
 		logrus.Fatal("rabbitmq fail creation a queue for servers")
 		return
 	}
+	logrus.Debug("rabbitmq successful connected")
 
 	// start listen a responses from agents
 	messages, err := broker.ConnQueue(config_.RabbitAgentQueue)
