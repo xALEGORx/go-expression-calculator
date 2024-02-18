@@ -141,7 +141,7 @@ docker-compose -f docker-compose-dev.yml up
 > Вы можете указать аргумент `-debug` для включения режима отладки
 
 ```sh
-go run cmd\orchestrator\main.go -debug
+go run cmd/orchestrator/main.go -debug
 ```
 
 6. Запустите первый экземпляр агента с базовыми параметрами
@@ -149,7 +149,7 @@ go run cmd\orchestrator\main.go -debug
 > Более детальное объяснение параметров <a href="#env-agent-params">Настройка .env и параметры агента</a>
 
 ```sh
-go run cmd\agent\main.go -agent Agent -ping 60 -threads 10 -url amqp://guest:guest@localhost:5672 -wait 10 -debug
+go run cmd/agent/main.go -agent Agent -ping 5 -threads 10 -url amqp://guest:guest@localhost:5672 -wait 10 -debug
 ```
 
 7. Перейдите в папку с Frontend
