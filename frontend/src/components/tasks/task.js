@@ -1,6 +1,13 @@
 import React from 'react'
 
 export default function Task({ task }) {
+    const date = new Date(task.created_at);
+
+    const addLeadingZero = (number) => {
+        return number < 10 ? '0' + number : number;
+    };
+    const formattedDate = `${addLeadingZero(date.getDate())}.${addLeadingZero(date.getMonth() + 1)}.${date.getFullYear()} ${addLeadingZero(date.getHours())}:${addLeadingZero(date.getMinutes())}:${addLeadingZero(date.getSeconds())}`;
+
     const statuscoloros = {
         "completed": "bg-[#08c708]",
         "created": "bg-[#fbff03]",
@@ -24,7 +31,7 @@ export default function Task({ task }) {
             </div>
             <div>
                 <span className="text-completed"></span>
-                <span className="text-gray text-sm">{task.created_at}</span>
+                <span className="text-gray text-sm">{formattedDate}</span>
             </div>
         </div>
     )
