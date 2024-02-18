@@ -16,6 +16,7 @@ type IConfig struct {
 	Threads          int
 	Ping             int
 	Wait             int
+	Debug            bool
 }
 
 func main() {
@@ -27,10 +28,11 @@ func main() {
 	flag.IntVar(&config.Threads, "threads", 5, "Threads count for goroutine")
 	flag.IntVar(&config.Ping, "ping", 60, "Ping time in seconds")
 	flag.IntVar(&config.Wait, "wait", 5, "Wait time (emulating long query)")
+	flag.BoolVar(&config.Debug, "debug", false, "Enable debug mode")
 	flag.Parse()
 
 	// initialization a logrus
-	logger.Init()
+	logger.Init(config.Debug)
 
 	// try to connect to rabbitmq
 	broker, err := rabbitmq.Init(config.RabbitURL)

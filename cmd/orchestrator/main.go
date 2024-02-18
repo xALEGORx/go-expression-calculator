@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
 	"github.com/xALEGORx/go-expression-calculator/internal/orchestrator"
@@ -17,8 +18,13 @@ import (
 // @description Endpoints for expression calculator by ALEGOR
 // @BasePath /api/v1
 func main() {
+	// enable or disable debug mode
+	var debug bool
+	flag.BoolVar(&debug, "debug", false, "Enable debug mode")
+	flag.Parse()
+
 	// initialization a logrus
-	logger.Init()
+	logger.Init(debug)
 	// parsing .env file to config struct
 	config_, err := config.Init()
 	if err != nil {

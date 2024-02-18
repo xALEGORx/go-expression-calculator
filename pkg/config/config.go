@@ -2,10 +2,11 @@ package config
 
 import (
 	"fmt"
-	"github.com/joho/godotenv"
-	"github.com/sirupsen/logrus"
 	"os"
 	"strconv"
+
+	"github.com/joho/godotenv"
+	"github.com/sirupsen/logrus"
 )
 
 type IConfig struct {
@@ -48,7 +49,7 @@ func Init() (*IConfig, error) {
 		PostgresPassword: getEnv("POSTGRES_PASSWORD", "test12345"),
 		PostgresHost:     getEnv("POSTGRES_HOST", "localhost"),
 		PostgresPort:     getEnv("POSTGRES_PORT", "5432"),
-		PostgresDatabase: getEnv("POSTGRES_DATABASE", "calculator"),
+		PostgresDatabase: getEnv("POSTGRES_DB", "calculator"),
 
 		RabbitUser:       getEnv("RABBIT_USER", "guest"),
 		RabbitPassword:   getEnv("RABBIT_PASSWORD", "guest"),
