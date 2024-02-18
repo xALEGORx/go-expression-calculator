@@ -14,8 +14,7 @@ services:
     environment:
       POSTGRES_PASSWORD: test12345
       POSTGRES_USER: calculator
-    volumes:
-      - ./database:/var/lib/postgresql/data
+      POSTGRES_DB: calculator
     ports:
       - 5432:5432
     healthcheck:

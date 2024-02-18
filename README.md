@@ -49,7 +49,11 @@
 ## Как запустить проект?
 
 > [!NOTE]
-> В проекте предусмотрен запуск для Production и для локальной разработки. Просто используйте `docker-compose.yml` для полного разворачивания системы или `docker-compose-dev.yml` для локальной разработки.
+> В проекте предусмотрен запуск для Production и для локальной разработки. 
+>
+> Просто используйте `docker-compose.yml` для полного разворачивания системы или `docker-compose-dev.yml` для локальной разработки.
+>
+> Если у вас останутся вопросы по запуску проекта, пишите в Telegram: @alegor_golang 
 
 ### Перед установкой
 
@@ -106,7 +110,7 @@ docker-compose up
 > В дальнейшем данный билд можно передавать на другие сервера.
 
 ```sh
-go build -u build/agent cmd/agent/main.go
+go build -o build/agent cmd/agent/main.go
 ```
 
 6. Запустите первый экземпляр агента с базовыми параметрами
@@ -134,8 +138,10 @@ docker-compose -f docker-compose-dev.yml up
 
 5. Запустите оркестратор
 
+> Вы можете указать аргумент `-debug` для включения режима отладки
+
 ```sh
-go run cmd\orchestrator\main.go
+go run cmd\orchestrator\main.go -debug
 ```
 
 6. Запустите первый экземпляр агента с базовыми параметрами
@@ -143,7 +149,7 @@ go run cmd\orchestrator\main.go
 > Более детальное объяснение параметров <a href="#env-agent-params">Настройка .env и параметры агента</a>
 
 ```sh
-go run cmd\agent\main.go -agent Agent -ping 60 -threads 10 -url amqp://guest:guest@localhost:5672 -wait 10
+go run cmd\agent\main.go -agent Agent -ping 60 -threads 10 -url amqp://guest:guest@localhost:5672 -wait 10 -debug
 ```
 
 7. Перейдите в папку с Frontend
@@ -173,7 +179,7 @@ npm run start
 * `AGENT_PING` - время в секундах для отправления сигнала ping от агента, если агент не отправит в течении этого времени сообщение о пинге, то его статус будет изменен на `reconnected`
 * `AGENT_RESOLVE_TIME` - максимальное время в секундах для решения одной задачи, если в течении этого времени не будет получен ответ, то задача пересоздастся
 * `SERVER_ADDR` - IP:PORT для запуска HTTP сервера
-* `MODE` - `release` для отключения логгирования или `debug` для отладки всех действий
+* `MODE` - `release` или `debug` режим запуска Gin
 * `POSTGRES_HOST` & `RABBIT_HOST` - измените на `localhost` только при локальной разработке!
 
 Параметры запуска агента
@@ -181,6 +187,7 @@ npm run start
 * `-ping int` - время в секундах, раз в которое будет отправляться сообщение с пингов **(данный параметр должен быть меньше или равен параметру `AGENT_RESOLVE_TIME` из `.env`)**
 * `-threads int` - количество потоков (goroutine) для параллельного решения задач на одном агенте
 * `-wait int` - задержка решения задач для эмуляции выполнения долгих запросов
+* `-debug` - включить режим отладки
 * `-queue string` - имя очереди RabbitMQ с заданиями, при необходимости не менять
 * `-server string` - имя очереди RabbitMQ для ответов, при необходимости не менять
 * `-url string` - DSN строка для подключения RabbitMQ, при необходимости не менять
