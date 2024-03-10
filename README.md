@@ -204,11 +204,6 @@ npm run start
 Во вкладке `СЕРВЕРА` вы можете увидеть список всех запущенных агентов.
 
 
-## Автор
-
-* **[xALEGORx](https://github.com/xALEGORx)** - *Telegram: @alegor_golang*
-
-
 [GoLang]: https://img.shields.io/badge/Go-00ADD8?style=for-the-badge&logo=go&logoColor=white
 [GoLang-url]: https://go.dev/
 [React.js]: https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB
