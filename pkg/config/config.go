@@ -30,6 +30,9 @@ type IConfig struct {
 	AgentTimeout     int
 	AgentPing        int
 	AgentResolveTime int
+
+	JwtExpires int
+	JwtSecret  string
 }
 
 var config *IConfig
@@ -61,6 +64,9 @@ func Init() (*IConfig, error) {
 		AgentTimeout:     getEnvInt("AGENT_TIMEOUT", 600),
 		AgentPing:        getEnvInt("AGENT_PING", 60),
 		AgentResolveTime: getEnvInt("AGENT_RESOLVE_TIME", 600),
+
+		JwtExpires: getEnvInt("JWT_EXPIRES", 86400),
+		JwtSecret:  getEnv("JWT_SECRET", "Calcul@tor"),
 	}
 
 	// build a dsn connection string for RabbitMQ

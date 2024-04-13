@@ -16,6 +16,7 @@ type TaskModel struct {
 	Status     string    `json:"status"`
 	Answer     string    `json:"answer"`
 	AgentID    string    `json:"agent_id"`
+	UserID     int       `json:"user_id"`
 	CreatedAt  time.Time `json:"created_at"`
 	UpdatedAt  time.Time `json:"updated_at"`
 }
@@ -28,8 +29,8 @@ const (
 )
 
 // Get all tasks in database
-func (t *Task) GetAllTasks() ([]TaskModel, error) {
-	rows, err := database.DB.Query(context.Background(), "SELECT * FROM tasks ORDER BY task_id DESC")
+func (t *Task) GetAllTasks(userId int) ([]TaskModel, error) {
+	rows, err := database.DB.Query(context.Background(), "SELECT * FROM tasks WHERE user_id = $1 ORDER BY task_id DESC", userId)
 	if err != nil {
 		return nil, err
 	}
@@ -39,7 +40,7 @@ func (t *Task) GetAllTasks() ([]TaskModel, error) {
 
 	for rows.Next() {
 		var task TaskModel
-		if err = rows.Scan(&task.TaskID, &task.Expression, &task.Status, &task.Answer, &task.AgentID, &task.CreatedAt, &task.UpdatedAt); err != nil {
+		if err = rows.Scan(&task.TaskID, &task.Expression, &task.Status, &task.Answer, &task.AgentID, &task.UserID, &task.CreatedAt, &task.UpdatedAt); err != nil {
 			return nil, err
 		}
 		tasks = append(tasks, task)
@@ -53,11 +54,11 @@ func (t *Task) GetAllTasks() ([]TaskModel, error) {
 }
 
 // Create new row with task
-func (t *Task) Create(expression string) (int, error) {
+func (t *Task) Create(expression string, userId int) (int, error) {
 	var insertedID int
 
-	query := "INSERT INTO tasks (expression, status, answer, agent_id) VALUES ($1, $2, $3, $4) RETURNING task_id"
-	if err := database.DB.QueryRow(context.Background(), query, expression, STATUS_CREATED, "", "").Scan(&insertedID); err != nil {
+	query := "INSERT INTO tasks (expression, status, answer, agent_id, user_id) VALUES ($1, $2, $3, $4, $5) RETURNING task_id"
+	if err := database.DB.QueryRow(context.Background(), query, expression, STATUS_CREATED, "", "", userId).Scan(&insertedID); err != nil {
 		return 0, err
 	}
 
@@ -69,7 +70,7 @@ func (t *Task) GetById(taskId int) (TaskModel, error) {
 	var task TaskModel
 
 	query := "SELECT * FROM tasks WHERE task_id = $1"
-	if err := database.DB.QueryRow(context.Background(), query, taskId).Scan(&task.TaskID, &task.Expression, &task.Status, &task.Answer, &task.AgentID, &task.CreatedAt, &task.UpdatedAt); err != nil {
+	if err := database.DB.QueryRow(context.Background(), query, taskId).Scan(&task.TaskID, &task.Expression, &task.Status, &task.Answer, &task.AgentID, &task.UserID, &task.CreatedAt, &task.UpdatedAt); err != nil {
 		return task, err
 	}
 
@@ -110,7 +111,7 @@ func (t *Task) GetTasksForResolve() ([]TaskModel, error) {
 
 	for rows.Next() {
 		var task TaskModel
-		if err = rows.Scan(&task.TaskID, &task.Expression, &task.Status, &task.Answer, &task.AgentID, &task.CreatedAt, &task.UpdatedAt); err != nil {
+		if err = rows.Scan(&task.TaskID, &task.Expression, &task.Status, &task.Answer, &task.AgentID, &task.UserID, &task.CreatedAt, &task.UpdatedAt); err != nil {
 			return nil, err
 		}
 		tasks = append(tasks, task)

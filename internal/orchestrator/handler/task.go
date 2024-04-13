@@ -4,6 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/xALEGORx/go-expression-calculator/internal/orchestrator/repositories"
 	"github.com/xALEGORx/go-expression-calculator/internal/orchestrator/services"
+	"github.com/xALEGORx/go-expression-calculator/pkg/jwt"
 	"github.com/xALEGORx/go-expression-calculator/pkg/response"
 	"strconv"
 )
@@ -24,7 +25,8 @@ type TaskCreateRequest struct {
 // @Success 200 {object} response.SuccessResponse{data=[]repositories.AgentModel}
 // @Router /task [get]
 func (p *Task) Index(ctx *gin.Context) {
-	tasks, err := repositories.TaskRepository().GetAllTasks()
+	userId := jwt.New().JwtUserId(ctx)
+	tasks, err := repositories.TaskRepository().GetAllTasks(userId)
 	if err != nil {
 		response.InternalServerError(ctx, err.Error())
 		return
@@ -42,6 +44,7 @@ func (p *Task) Index(ctx *gin.Context) {
 // @Success 200 {object} response.SuccessResponse{data=repositories.AgentModel}
 // @Router /task [post]
 func (p *Task) Store(ctx *gin.Context) {
+	userId := jwt.New().JwtUserId(ctx)
 	var request TaskCreateRequest
 
 	if err := ctx.ShouldBindJSON(&request); err != nil {
@@ -49,7 +52,7 @@ func (p *Task) Store(ctx *gin.Context) {
 		return
 	}
 
-	task, err := services.TaskService().Create(request.Expression)
+	task, err := services.TaskService().Create(request.Expression, userId)
 	if err != nil {
 		response.InternalServerError(ctx, err.Error())
 		return
@@ -66,6 +69,7 @@ func (p *Task) Store(ctx *gin.Context) {
 // @Success 200 {object} response.SuccessResponse{data=repositories.AgentModel}
 // @Router /task/:id [get]
 func (p *Task) Show(ctx *gin.Context) {
+	userId := jwt.New().JwtUserId(ctx)
 	taskIdUrl := ctx.Param("id")
 	taskId, err := strconv.Atoi(taskIdUrl)
 	if taskId == 0 || err != nil {
@@ -73,11 +77,15 @@ func (p *Task) Show(ctx *gin.Context) {
 		return
 	}
 
-	tasks, err := repositories.TaskRepository().GetById(taskId)
+	task, err := repositories.TaskRepository().GetById(taskId)
 	if err != nil {
 		response.NotFound(ctx, err.Error())
 		return
 	}
+	if task.UserID != userId {
+		response.NotFound(ctx, "it's not your task")
+		return
+	}
 
-	response.Data(ctx, tasks)
+	response.Data(ctx, task)
 }

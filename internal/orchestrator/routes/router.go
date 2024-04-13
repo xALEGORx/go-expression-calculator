@@ -15,9 +15,18 @@ func InitRouter(router *gin.Engine) *gin.Engine {
 	v1 := router.Group("/api/v1")
 	v1.Use(middlewares.CORS())
 	{
+		// auth
+		{
+			auth := &handler.Auth{Route: v1.Group("/")}
+			auth.Route.POST("/register", auth.Register)
+			auth.Route.POST("/login", auth.Login)
+		}
+
 		// task
 		{
 			task := &handler.Task{Route: v1.Group("/task")}
+			task.Route.Use(middlewares.Auth())
+
 			task.Route.GET("", task.Index)
 			task.Route.POST("", task.Store)
 			task.Route.GET("/:id", task.Show)

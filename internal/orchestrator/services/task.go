@@ -15,8 +15,8 @@ type Task struct {
 	repo *repositories.Task
 }
 
-func (t *Task) Create(expression string) (repositories.TaskModel, error) {
-	taskId, err := t.repo.Create(expression)
+func (t *Task) Create(expression string, userId int) (repositories.TaskModel, error) {
+	taskId, err := t.repo.Create(expression, userId)
 
 	if err != nil {
 		return repositories.TaskModel{}, err
