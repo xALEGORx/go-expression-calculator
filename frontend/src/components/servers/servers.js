@@ -21,10 +21,10 @@ export default class Servers extends Component {
             let json = JSON.parse(response)
             let currentAgents = this.state.agents
             console.log(json)
-            if (json.action == "update_agent") {
+            if (json.action === "update_agent") {
                 let flag = false;
 
-                if (json.data.status == "deleted") {
+                if (json.data.status === "deleted") {
                     flag = true;
                     let deletedAgents = currentAgents.filter((currentAgent) => currentAgent.agent_id != json.data.agent_id)
                     currentAgents = deletedAgents

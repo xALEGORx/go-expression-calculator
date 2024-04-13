@@ -8,14 +8,14 @@ export default function Task({ task }) {
     };
     const formattedDate = `${addLeadingZero(date.getDate())}.${addLeadingZero(date.getMonth() + 1)}.${date.getFullYear()} ${addLeadingZero(date.getHours())}:${addLeadingZero(date.getMinutes())}:${addLeadingZero(date.getSeconds())}`;
 
-    const statuscoloros = {
+    const statusColor = {
         "completed": "bg-[#08c708]",
         "created": "bg-[#fbff03]",
         "processed": "bg-[#ffae00]",
         "fail": "bg-[#c70808]"
     };
 
-    const taskColor = statuscoloros[task.status];
+    const taskColor = statusColor[task.status];
 
     return (
         <div className="border border-gray flex items-center rounded-md p-3 justify-between">

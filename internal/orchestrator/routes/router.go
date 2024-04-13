@@ -20,6 +20,14 @@ func InitRouter(router *gin.Engine) *gin.Engine {
 			auth := &handler.Auth{Route: v1.Group("/")}
 			auth.Route.POST("/register", auth.Register)
 			auth.Route.POST("/login", auth.Login)
+
+			// why? idk
+			auth.Route.OPTIONS("/register", func(c *gin.Context) {
+				c.Status(http.StatusOK)
+			})
+			auth.Route.OPTIONS("/login", func(c *gin.Context) {
+				c.Status(http.StatusOK)
+			})
 		}
 
 		// task
